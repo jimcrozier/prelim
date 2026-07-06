@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prelim Quiz — 20 Multiple Choice</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0d1117; color: #e2e8f0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 32px 20px; }
+.header { text-align: center; margin-bottom: 20px; }
+.header h1 { font-size: 1rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #475569; }
+.scorebar { display: flex; justify-content: space-between; width: 100%; max-width: 700px; font-size: 0.75rem; color: #64748b; margin-bottom: 6px; }
+.progress-bar { width: 100%; max-width: 700px; height: 3px; background: #1e2330; border-radius: 2px; margin-bottom: 20px; }
+.progress-fill { height: 100%; background: #6366f1; border-radius: 2px; transition: width 0.3s ease; }
+.card { background: #161b27; border: 1px solid #252d3d; border-radius: 16px; width: 100%; max-width: 700px; padding: 30px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 24px 60px rgba(0,0,0,0.5); }
+.card-meta { display: flex; gap: 8px; align-items: center; }
+.tag { display: inline-block; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; padding: 3px 10px; border-radius: 99px; }
+.tag.metrics { background: #1a2f4a; color: #60a5fa; }
+.tag.micro { background: #1a3a2a; color: #4ade80; }
+.topic-tag { font-size: 0.65rem; color: #475569; font-style: italic; }
+.question { font-size: 1.0rem; font-weight: 600; line-height: 1.65; color: #f1f5f9; }
+.options { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.opt { text-align: left; background: #0f1420; border: 1px solid #252d3d; border-radius: 10px; color: #cbd5e1; font-size: 0.9rem; line-height: 1.6; padding: 12px 16px; cursor: pointer; transition: all 0.15s; display: flex; gap: 10px; }
+.opt:hover:not(:disabled) { border-color: #6366f1; background: #141a2c; }
+.opt:disabled { cursor: default; }
+.opt .letter { font-weight: 800; color: #6366f1; flex-shrink: 0; }
+.opt.correct { border-color: #16a34a; background: #0d2417; color: #86efac; }
+.opt.wrong { border-color: #dc2626; background: #2a1214; color: #fca5a5; }
+.opt.dim { opacity: 0.45; }
+.explain { display: none; background: #0f1420; border: 1px solid #2a3a5a; border-radius: 10px; padding: 14px 16px; font-size: 0.85rem; line-height: 1.75; color: #cbd5e1; }
+.explain.visible { display: block; animation: fadeIn 0.2s ease; }
+.explain .verdict { font-weight: 700; color: #818cf8; display: block; margin-bottom: 6px; }
+.explain .ref { display: block; margin-top: 8px; font-size: 0.72rem; color: #475569; font-style: italic; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.nav { display: flex; gap: 10px; margin-top: 18px; max-width: 700px; width: 100%; }
+.nav button { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #3730a3; background: #1e1b4b; color: #a5b4fc; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.nav button:hover:not(:disabled) { background: #2e2775; }
+.nav button:disabled { opacity: 0.25; cursor: default; }
+.shortcuts { font-size: 0.65rem; color: #334155; text-align: center; margin-top: 10px; letter-spacing: 0.06em; }
+.result-line { display: flex; justify-content: space-between; padding: 7px 4px; border-bottom: 1px solid #1e2330; font-size: 0.82rem; }
+.result-line .ok { color: #4ade80; } .result-line .miss { color: #f87171; }
+.bigscore { font-size: 2.4rem; font-weight: 800; text-align: center; color: #a5b4fc; margin: 6px 0; }
+.grade { text-align: center; color: #64748b; font-size: 0.9rem; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<div class="header"><h1>Prelim Quiz · 20 Multiple Choice · Micro &amp; Metrics</h1></div>
+<div class="scorebar"><span id="topicLabel"></span><span id="scoreLabel">Score: 0</span></div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="card" id="card"></div>
+
+<div class="nav">
+  <button id="nextBtn" onclick="next()" disabled>Next →</button>
+</div>
+<div class="shortcuts">Press 1–4 to answer · Enter/→ for next question</div>
+
+<script>
+const quiz = [
+
+// ── METRICS ──────────────────────────────────────────────────────────────
+{
+  type: "metrics", topic: "WOLS residuals",
+  q: "In WOLS minimizing $\\sum_i f(X_i)(Y_i-X_i'b)^2$ with non-constant weights $f(X_i)>0$ and a constant included, which statement is guaranteed by the FOC in every sample?",
+  opts: [
+    "$\\sum_i f(X_i)\\,X_i\\,\\hat{e}_i = 0$",
+    "$\\sum_i \\hat{e}_i = 0$",
+    "$\\sum_i X_i\\hat{e}_i = 0$",
+    "$\\hat{e}_i = 0$ for every $i$"
+  ],
+  correct: 0,
+  explain: `<span class="verdict">The FOC is exactly the weighted orthogonality condition.</span>
+Differentiating the weighted SSR gives $-2\\sum_i f(X_i)X_i(Y_i-X_i'b)=0$, i.e. $\\sum_i f(X_i)X_i\\hat{e}_i=0$. The unweighted $\\sum\\hat{e}_i=0$ holds only if $f$ is constant (plain OLS) — the 2025 exams tested this trap verbatim.<span class="ref">Guide §3.1, step (3)</span>`
+},
+{
+  type: "metrics", topic: "Sandwich variance",
+  q: "In $\\sqrt{n}(\\hat{\\beta}-\\beta)\\xrightarrow{d}N(0, A^{-1}BA^{-1})$ with $A=E[X_iX_i']$, $B=E[X_iX_i'e_i^2]$, when does the sandwich collapse to $\\sigma^2 A^{-1}$?",
+  opts: [
+    "Whenever the sample is large enough",
+    "When the regressors are exogenous: $E[e_i|X_i]=0$",
+    "Under conditional homoskedasticity: $E[e_i^2|X_i]=\\sigma^2$",
+    "When the errors are normally distributed"
+  ],
+  correct: 2,
+  explain: `<span class="verdict">Homoskedasticity makes $B=\\sigma^2 A$.</span>
+By LIE, $B=E[X_iX_i'E(e_i^2|X_i)]=\\sigma^2E[X_iX_i']=\\sigma^2A$, so $A^{-1}BA^{-1}=\\sigma^2A^{-1}$. Exogeneity is needed for consistency (it makes the mean zero), not for collapsing the variance; normality is irrelevant asymptotically.<span class="ref">Guide §2 core dump; §4.3</span>`
+},
+{
+  type: "metrics", topic: "Delta method",
+  q: "$\\sqrt{n}(\\hat{\\beta}-\\beta)\\xrightarrow{d}N(0,V)$ and $\\gamma=\\beta^2$. The asymptotic variance of $\\hat{\\beta}^2$ is:",
+  opts: [
+    "$V^2$",
+    "$2\\beta V$",
+    "$4\\beta^2 V$",
+    "$\\beta^4 V$"
+  ],
+  correct: 2,
+  explain: `<span class="verdict">$[g'(\\beta)]^2 V$ with $g'(\\beta)=2\\beta$.</span>
+$\\sqrt{n}(\\hat{\\beta}^2-\\beta^2)\\xrightarrow{d}N(0,\\,4\\beta^2V)$. Remember it's the derivative <i>squared</i> times $V$ — and don't forget the separate CMT step for consistency before this.<span class="ref">Guide §3.2 table</span>`
+},
+{
+  type: "metrics", topic: "LATE assumptions",
+  q: "In the LATE framework with binary instrument $Z$ and treatment $D$, which assumption rules out defiers?",
+  opts: [
+    "Independence: $Z\\perp(Y(0),Y(1),D(0),D(1))$",
+    "Exclusion: $Z$ affects $Y$ only through $D$",
+    "Relevance: $E[D|Z=1]\\neq E[D|Z=0]$",
+    "Monotonicity: $D_i(1)\\ge D_i(0)$ for all $i$"
+  ],
+  correct: 3,
+  explain: `<span class="verdict">Monotonicity — the instrument never pushes anyone out of treatment.</span>
+Defiers have $(D(0),D(1))=(1,0)$, exactly what $D_i(1)\\ge D_i(0)$ forbids. Without it the Wald ratio mixes complier and defier effects with opposite signs. I-REM: Independence, Relevance, Exclusion, Monotonicity.<span class="ref">Guide §3.3</span>`
+},
+{
+  type: "metrics", topic: "Over-identified IV",
+  q: "With $L$ instruments and $K$ regressors, $L \\gt K$, the correct estimator is:",
+  opts: [
+    "$(Z'X)^{-1}Z'Y$",
+    "$(X'X)^{-1}X'P_ZY$",
+    "$(Z'Z)^{-1}Z'Y$",
+    "$(X'P_ZX)^{-1}X'P_ZY$ with $P_Z=Z(Z'Z)^{-1}Z'$"
+  ],
+  correct: 3,
+  explain: `<span class="verdict">2SLS — project $X$ onto the instrument space first.</span>
+$(Z'X)$ is $L\\times K$, not square, so $(Z'X)^{-1}$ doesn't exist — writing it is an automatic deduction. 2SLS = OLS of $Y$ on $\\hat{X}=P_ZX$, using $P_Z'=P_Z$ and $P_Z^2=P_Z$. Option (c) is the reduced form on instruments, not IV.<span class="ref">Guide §3.5</span>`
+},
+{
+  type: "metrics", topic: "Measurement error",
+  q: "Classical measurement error: $x^*=x+\\varepsilon$ with $\\sigma_x^2=4$, $\\sigma_\\varepsilon^2=1$, true slope $\\beta_1=5$. The plim of the OLS slope of $Y$ on $x^*$ is:",
+  opts: [
+    "$5$ — classical error is harmless",
+    "$4$ — attenuated by the reliability ratio $0.8$",
+    "$6.25$ — inflated by the noise",
+    "$0$ — OLS is uninformative"
+  ],
+  correct: 1,
+  explain: `<span class="verdict">$\\mathrm{plim}\\,\\hat{\\beta}_1 = \\beta_1\\frac{\\sigma_x^2}{\\sigma_x^2+\\sigma_\\varepsilon^2} = 5\\times\\frac{4}{5} = 4$.</span>
+Attenuation bias: always toward zero, sign preserved, worse as the noise share grows. The composite error $u-\\beta_1\\varepsilon$ correlates with $x^*$ through $-\\beta_1\\sigma_\\varepsilon^2$.<span class="ref">Guide §4.1</span>`
+},
+{
+  type: "metrics", topic: "Panel FE degrees of freedom",
+  q: "For the within (FE) estimator with $N$ units, $T$ periods, $K$ regressors, the correct degrees of freedom for $\\hat{\\sigma}_u^2$ is:",
+  opts: [
+    "$NT-K$",
+    "$NT-N-T-K$",
+    "$N(T-1)-K$",
+    "$N-K$"
+  ],
+  correct: 2,
+  explain: `<span class="verdict">$N(T-1)-K$ — demeaning eats one degree of freedom per unit.</span>
+The within transformation imposes $N$ constraints (each unit's residuals average to zero). Using $NT-K$ understates $\\hat{\\sigma}_u^2$ — a named deduction on these exams.<span class="ref">Guide §4.5</span>`
+},
+{
+  type: "metrics", topic: "Joint Wald test",
+  q: "Testing $H_0:\\omega_1=\\omega_2=\\omega_3=0$ with a heteroskedasticity-robust Wald statistic, the null distribution is:",
+  opts: [
+    "$\\chi^2(1)$",
+    "$N(0,1)$",
+    "$\\chi^2(3)$",
+    "$F(3, n-4)$ exactly, in any sample size"
+  ],
+  correct: 2,
+  explain: `<span class="verdict">$\\chi^2(q)$ with $q=3$ restrictions — count the rows of $R$.</span>
+$W_n=n(R\\hat{\\omega})'(R\\hat{V}R')^{-1}(R\\hat{\\omega})\\xrightarrow{d}\\chi^2(3)$ under $H_0$. The exact-$F$ answer needs classical assumptions (homoskedastic normal errors); the robust Wald is an asymptotic $\\chi^2$ test. Bonus: it's consistent because $W_n\\to\\infty$ at rate $n$ under any fixed alternative.<span class="ref">Guide §4.3</span>`
+},
+{
+  type: "metrics", topic: "Multiple testing",
+  q: "You run $m=20$ tests at $\\alpha=0.05$. To guarantee FWER $\\le 0.05$ by Bonferroni, each individual test should use level:",
+  opts: [
+    "$0.05$ — no adjustment needed if tests are independent",
+    "$0.01$",
+    "$0.0025$",
+    "$0.05/\\sqrt{20}\\approx 0.011$"
+  ],
+  correct: 2,
+  explain: `<span class="verdict">$\\alpha/m = 0.05/20 = 0.0025$.</span>
+By the union bound, FWER $\\le\\sum_j\\alpha/m=\\alpha$ — no independence required. Unadjusted, FWER $=1-(0.95)^{20}\\approx 64\\%$. Holm step-down gives the same guarantee with more power.<span class="ref">Guide §4.3</span>`
+},
+{
+  type: "metrics", topic: "Staggered DiD",
+  q: "With staggered adoption and heterogeneous dynamic treatment effects, plain two-way FE can be badly biased even under exact parallel trends. Why?",
+  opts: [
+    "Because parallel trends is untestable",
+    "Because the TWFE estimand puts negative weights on some ATT$(g,t)$ — already-treated units serve as controls",
+    "Because clustering fails with staggered timing",
+    "Because ATT$(g,t)$ is not identified under parallel trends"
+  ],
+  correct: 1,
+  explain: `<span class="verdict">It's a weighting problem, not a trends problem.</span>
+TWFE compares newly-treated to already-treated units whose effects are still evolving; the implied weights on the ATT$(g,t)$ building blocks can be negative, flipping signs in the aggregate. Remedies to name: Callaway–Sant'Anna, Sun–Abraham.<span class="ref">Guide §4.4</span>`
+},
+
+// ── MICRO ────────────────────────────────────────────────────────────────
+{
+  type: "micro", topic: "Linear utility demand",
+  q: "$u=\\alpha_1x_1+\\alpha_2x_2+\\alpha_3x_3$ with $\\alpha=(2,3,1)$ and $p=(1,2,1)$. Where does wealth $w$ go?",
+  opts: [
+    "Split across goods in proportion to the $\\alpha_i$",
+    "The interior tangency point from the Lagrangian",
+    "All on good 2 — highest $\\alpha_i = 3$",
+    "All on good 1 — highest $\\alpha_i/p_i = 2$"
+  ],
+  correct: 3,
+  explain: `<span class="verdict">Best utility per dollar: $\\alpha_1/p_1=2$ beats $3/2=1.5$ and $1$.</span>
+Linear utility is not strictly quasi-concave — no tangency; the solution is the corner $x_1^*=w/p_1$, $v=2w$. Option (c) is the classic distractor: it ignores prices. And note the EMP flips to $\\min_i p_i/\\alpha_i$ (buy utils where cheapest).<span class="ref">Guide §3.1 quartet</span>`
+},
+{
+  type: "micro", topic: "Convex utility",
+  q: "$u=x_1^2+x_2^2$, $p=(1,2)$, $w=10$. The Walrasian demand is:",
+  opts: [
+    "The tangency point $(2,4)$ from the FOCs",
+    "$(10,\\,0)$ — corner on the cheaper good",
+    "$(0,\\,5)$ — corner on the higher-$\\alpha$ good",
+    "$(5,\\,2.5)$ — spend half on each"
+  ],
+  correct: 1,
+  explain: `<span class="verdict">Convex $u$ ⇒ the interior critical point is the MINIMUM on the budget line.</span>
+Compare corners: $(10,0)$ gives $u=100$; $(0,5)$ gives $u=25$. Rule: $i^*=\\arg\\max_i \\alpha_i/p_i^2$, $v=w^2\\max_i\\alpha_i/p_i^2=100$. FOCs are necessary but sufficiency needs quasi-concavity — convex utility fails it, so verify by comparing corners. (The EMP, by contrast, is interior.)<span class="ref">Guide §3.1–3.2</span>`
+},
+{
+  type: "micro", topic: "Leontief expenditure",
+  q: "$u=\\min(a_1x_1,a_2x_2)$. The expenditure function is:",
+  opts: [
+    "$e(p,u) = u\\cdot\\bigl(\\dfrac{p_1}{a_1}+\\dfrac{p_2}{a_2}\\bigr)$",
+    "$e(p,u) = u\\cdot\\min_i \\dfrac{p_i}{a_i}$",
+    "$e(p,u) = u\\cdot\\dfrac{p_1^{1/2}p_2^{1/2}}{(a_1a_2)^{1/2}}$",
+    "$e(p,u) = u\\cdot\\max_i \\dfrac{p_i}{a_i}$"
+  ],
+  correct: 0,
+  explain: `<span class="verdict">Perfect complements: you must buy the whole bundle — costs ADD.</span>
+At the kink $a_1x_1=a_2x_2=u$, so $h_i=u/a_i$ and $e=p_1\\frac{u}{a_1}+p_2\\frac{u}{a_2}=u\\sum_j p_j/a_j$. The $\\min$ formula (option b) belongs to LINEAR utility, where you buy utils only from the cheapest source — the classic quartet mix-up.<span class="ref">Guide §3.1 quartet</span>`
+},
+{
+  type: "micro", topic: "Duality",
+  q: "The identity $e(p,\\,v(p,w))=w$ requires which assumption on preferences?",
+  opts: [
+    "Strict convexity",
+    "Continuity",
+    "Local non-satiation",
+    "Homotheticity"
+  ],
+  correct: 2,
+  explain: `<span class="verdict">Local non-satiation — it makes the constraints bind.</span>
+LNS forces the consumer to spend all wealth (budget binds) and the EMP to hit the utility target exactly, so the UMP and EMP trace the same frontier and the four duality identities hold. Convexity/continuity matter for existence and uniqueness, not for this identity.<span class="ref">Guide §3.2</span>`
+},
+{
+  type: "micro", topic: "Utility representation",
+  q: "If $u$ represents $\\succsim$ (i.e., $x\\succsim y \\iff u(x)\\ge u(y)$), which properties MUST $\\succsim$ have?",
+  opts: [
+    "Completeness, transitivity, and continuity",
+    "Completeness and transitivity — but not necessarily continuity",
+    "Transitivity and continuity — but not necessarily completeness",
+    "Only completeness"
+  ],
+  correct: 1,
+  explain: `<span class="verdict">Representation ⇒ complete + transitive; continuity is NOT implied.</span>
+$\\ge$ on $\\mathbb{R}$ is complete and transitive, and those properties pull back through $u$. But a discontinuous $u$ represents a discontinuous preference just fine — continuity is only needed (Debreu) to guarantee a CONTINUOUS representation exists on infinite domains.<span class="ref">Guide §3.3</span>`
+},
+{
+  type: "micro", topic: "Counterexample bank",
+  q: "Lexicographic preferences on $\\mathbb{R}^2$ are the canonical counterexample showing:",
+  opts: [
+    "Complete + transitive preferences can fail continuity (and lack a utility representation)",
+    "Transitive preferences can fail completeness",
+    "Complete preferences can fail transitivity",
+    "Continuous preferences can fail transitivity"
+  ],
+  correct: 0,
+  explain: `<span class="verdict">Complete ✓, transitive ✓, continuous ✗.</span>
+The sequence $x^n=(1-\\frac{1}{n},1)\\to(1,1)$ with $y=(1,0)$: every $x^n\\prec y$ but the limit $\\succ y$ — upper contour sets aren't closed. Condorcet cycles are the complete-not-transitive example; Pareto partial orders are transitive-not-complete. Keep the bank straight.<span class="ref">Guide §3.3</span>`
+},
+{
+  type: "micro", topic: "Expected utility",
+  q: "Ann ranks lotteries by $W(p) = EV(p) - \\mathrm{Var}(p)$. Which is true?",
+  opts: [
+    "No utility representation exists — the relation is incomplete",
+    "A utility representation exists AND it is an EU representation",
+    "It is an EU representation with Bernoulli utility $u(z)=z-z^2$",
+    "A utility representation exists, but it is NOT EU — variance is quadratic in $p$, violating independence"
+  ],
+  correct: 3,
+  explain: `<span class="verdict">Complete and transitive (it's a real-valued score) — so a utility rep exists — but not linear in $p$.</span>
+$\\mathrm{Var}(\\alpha p+(1-\\alpha)r)\\neq\\alpha\\mathrm{Var}(p)+(1-\\alpha)\\mathrm{Var}(r)$, so independence fails. Contrast with the AND-criterion (higher mean AND lower variance), which is incomplete and has no utility rep at all — that's option (a)'s scenario, not this one.<span class="ref">Guide §3.4</span>`
+},
+{
+  type: "micro", topic: "Repeated competition",
+  q: "Grim-trigger collusion thresholds: Bertrand $\\delta^*=\\frac{1}{2}$ vs Cournot $\\delta^*=\\frac{9}{17}$. Why is Bertrand collusion easier to sustain?",
+  opts: [
+    "Bertrand deviation profits are smaller",
+    "Bertrand punishment is harsher — Nash reversion gives zero profit instead of positive Cournot profit",
+    "Cournot firms discount the future more",
+    "Bertrand firms split the monopoly profit unequally"
+  ],
+  correct: 1,
+  explain: `<span class="verdict">$\\delta^*=\\frac{\\pi^D-\\pi^M}{\\pi^D-\\pi^N}$: a lower punishment payoff $\\pi^N$ enlarges the denominator.</span>
+Bertrand reversion: $\\pi^N=0$. Cournot reversion: $\\pi^N=\\frac{(a-c)^2}{9} \\gt 0$. Deviation profits are actually LARGER under Bertrand (you take the whole market), but the threat of zero profit forever dominates. Temptation over stakes.<span class="ref">Guide §3.5</span>`
+},
+{
+  type: "micro", topic: "Signaling — Riley equilibrium",
+  q: "Spence signaling, cost $e/\\theta$, types $\\theta_L=1$, $\\theta_H=3$, competitive wages. The least-cost separating (Riley) education level for the high type is:",
+  opts: [
+    "$e_H^*=2$",
+    "$e_H^*=3$",
+    "$e_H^*=6$",
+    "$e_H^*=0$ — signaling is unnecessary with competitive wages"
+  ],
+  correct: 0,
+  explain: `<span class="verdict">$e_H^*=\\theta_L(\\theta_H-\\theta_L)=1\\times 2=2$ — the IC-L floor binds.</span>
+The low type must (weakly) prefer honesty: $\\theta_L \\ge \\theta_H - e_H/\\theta_L \\Rightarrow e_H\\ge 2$. IC-H gives the ceiling $\\theta_H(\\theta_H-\\theta_L)=6$ (option c) — any $e_H\\in[2,6]$ separates, and Riley picks the least wasteful floor. Check IC-H: $3-\\frac{2}{3} \\gt 1$ ✓.<span class="ref">Guide §3.6</span>`
+},
+{
+  type: "micro", topic: "Finite repetition",
+  q: "A stage game has a UNIQUE Nash equilibrium. The game is repeated $T=100$ times. In the unique SPNE:",
+  opts: [
+    "Cooperation can be sustained in early periods if players are patient",
+    "Any feasible individually-rational payoff can be sustained (Folk theorem)",
+    "Cooperation is sustained in all but the last period",
+    "The stage NE is played in every period — cooperation is impossible"
+  ],
+  correct: 3,
+  explain: `<span class="verdict">Backward induction unravels everything.</span>
+Period 100 must be the stage NE regardless of history; then period 99 has no credible carrot or stick; induction propagates to period 1. The Folk theorem needs an INFINITE horizon — or, in finite games, MULTIPLE stage NE to use as carrot and stick (the Aug 2025 twist).<span class="ref">Guide §3.5</span>`
+}
+
+];
+
+let current = 0;
+let score = 0;
+let answered = false;
+const results = [];
+
+function render() {
+  const q = quiz[current];
+  const card = document.getElementById("card");
+  let html = '';
+  html += '<div class="card-meta"><span class="tag ' + q.type + '">' + (q.type === "metrics" ? "Econometrics" : "Microeconomics") + '</span><span class="topic-tag">' + q.topic + '</span></div>';
+  html += '<div class="question">Q' + (current+1) + '. ' + q.q + '</div>';
+  html += '<div class="options">';
+  const letters = ['A','B','C','D'];
+  for (let i = 0; i < q.opts.length; i++) {
+    html += '<button class="opt" id="opt'+i+'" onclick="pick('+i+')"><span class="letter">'+letters[i]+'</span><span>'+q.opts[i]+'</span></button>';
+  }
+  html += '</div>';
+  html += '<div class="explain" id="explain">' + q.explain + '</div>';
+  card.innerHTML = html;
+
+  answered = false;
+  document.getElementById("nextBtn").disabled = true;
+  document.getElementById("nextBtn").textContent = current === quiz.length - 1 ? "Finish ✓" : "Next →";
+  const pct = (current / quiz.length * 100).toFixed(0);
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("topicLabel").textContent = "Question " + (current+1) + " / " + quiz.length;
+  document.getElementById("scoreLabel").textContent = "Score: " + score;
+  if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([card]);
+}
+
+function pick(i) {
+  if (answered) return;
+  answered = true;
+  const q = quiz[current];
+  const right = i === q.correct;
+  if (right) score++;
+  results.push({ topic: q.topic, type: q.type, right: right });
+  for (let j = 0; j < q.opts.length; j++) {
+    const el = document.getElementById("opt" + j);
+    el.disabled = true;
+    if (j === q.correct) el.classList.add("correct");
+    else if (j === i) el.classList.add("wrong");
+    else el.classList.add("dim");
+  }
+  const ex = document.getElementById("explain");
+  ex.classList.add("visible");
+  document.getElementById("scoreLabel").textContent = "Score: " + score;
+  document.getElementById("nextBtn").disabled = false;
+  if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([ex]);
+}
+
+function next() {
+  if (!answered) return;
+  if (current < quiz.length - 1) { current++; render(); }
+  else finish();
+}
+
+function finish() {
+  const card = document.getElementById("card");
+  const pctScore = Math.round(score / quiz.length * 100);
+  let grade;
+  if (pctScore >= 90) grade = "Ace territory. Keep it warm.";
+  else if (pctScore >= 75) grade = "Solid — drill the misses below, then re-run.";
+  else if (pctScore >= 60) grade = "Passing-adjacent. The misses map to guide sections — restudy those first.";
+  else grade = "Back to the guides — Tier 1 sections first, then re-run this quiz.";
+  let html = '<div class="bigscore">' + score + ' / ' + quiz.length + '</div>';
+  html += '<div class="grade">' + pctScore + '% — ' + grade + '</div>';
+  for (let i = 0; i < results.length; i++) {
+    const r = results[i];
+    html += '<div class="result-line"><span>Q' + (i+1) + ' · ' + (r.type === "metrics" ? "Metrics" : "Micro") + ' · ' + r.topic + '</span><span class="' + (r.right ? 'ok' : 'miss') + '">' + (r.right ? '✓' : '✗') + '</span></div>';
+  }
+  html += '<div class="nav" style="margin-top:16px"><button onclick="restart()">↻ Restart quiz</button></div>';
+  card.innerHTML = html;
+  document.getElementById("progressFill").style.width = "100%";
+  document.getElementById("topicLabel").textContent = "Done";
+  document.getElementById("nextBtn").disabled = true;
+}
+
+function restart() {
+  current = 0; score = 0; answered = false; results.length = 0;
+  render();
+}
+
+document.addEventListener("keydown", e => {
+  if (["1","2","3","4"].includes(e.key) && !answered) { pick(parseInt(e.key)-1); }
+  if ((e.key === "Enter" || e.key === "ArrowRight") && answered) next();
+});
+
+render();
+</script>
+</body>
+</html>
