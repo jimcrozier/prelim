@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Theory Quiz — 30 Easy</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0d1117; color: #e2e8f0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 32px 20px; }
+.header { text-align: center; margin-bottom: 20px; }
+.header h1 { font-size: 1rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #475569; }
+.scorebar { display: flex; justify-content: space-between; width: 100%; max-width: 700px; font-size: 0.75rem; color: #64748b; margin-bottom: 6px; }
+.progress-bar { width: 100%; max-width: 700px; height: 3px; background: #1e2330; border-radius: 2px; margin-bottom: 20px; }
+.progress-fill { height: 100%; background: #6366f1; border-radius: 2px; transition: width 0.3s ease; }
+.card { background: #161b27; border: 1px solid #252d3d; border-radius: 16px; width: 100%; max-width: 700px; padding: 30px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 24px 60px rgba(0,0,0,0.5); }
+.card-meta { display: flex; gap: 8px; align-items: center; }
+.tag { display: inline-block; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; padding: 3px 10px; border-radius: 99px; }
+.tag.metrics { background: #1a2f4a; color: #60a5fa; }
+.tag.micro { background: #1a3a2a; color: #4ade80; }
+.topic-tag { font-size: 0.65rem; color: #475569; font-style: italic; }
+.question { font-size: 1.0rem; font-weight: 600; line-height: 1.65; color: #f1f5f9; }
+.options { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.opt { text-align: left; background: #0f1420; border: 1px solid #252d3d; border-radius: 10px; color: #cbd5e1; font-size: 0.9rem; line-height: 1.6; padding: 12px 16px; cursor: pointer; transition: all 0.15s; display: flex; gap: 10px; }
+.opt:hover:not(:disabled) { border-color: #6366f1; background: #141a2c; }
+.opt:disabled { cursor: default; }
+.opt .letter { font-weight: 800; color: #6366f1; flex-shrink: 0; }
+.opt.correct { border-color: #16a34a; background: #0d2417; color: #86efac; }
+.opt.wrong { border-color: #dc2626; background: #2a1214; color: #fca5a5; }
+.opt.dim { opacity: 0.45; }
+.explain { display: none; background: #0f1420; border: 1px solid #2a3a5a; border-radius: 10px; padding: 14px 16px; font-size: 0.85rem; line-height: 1.75; color: #cbd5e1; }
+.explain.visible { display: block; animation: fadeIn 0.2s ease; }
+.explain .verdict { font-weight: 700; color: #818cf8; display: block; margin-bottom: 6px; }
+.explain .ref { display: block; margin-top: 8px; font-size: 0.72rem; color: #475569; font-style: italic; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.nav { display: flex; gap: 10px; margin-top: 18px; max-width: 700px; width: 100%; }
+.nav button { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #3730a3; background: #1e1b4b; color: #a5b4fc; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.nav button:hover:not(:disabled) { background: #2e2775; }
+.nav button:disabled { opacity: 0.25; cursor: default; }
+.shortcuts { font-size: 0.65rem; color: #334155; text-align: center; margin-top: 10px; letter-spacing: 0.06em; }
+.result-line { display: flex; justify-content: space-between; padding: 7px 4px; border-bottom: 1px solid #1e2330; font-size: 0.82rem; }
+.result-line .ok { color: #4ade80; } .result-line .miss { color: #f87171; }
+.bigscore { font-size: 2.4rem; font-weight: 800; text-align: center; color: #a5b4fc; margin: 6px 0; }
+.grade { text-align: center; color: #64748b; font-size: 0.9rem; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<div class="header"><h1>Game Theory Quiz · 30 Questions · Easy Warm-Up</h1></div>
+<div class="scorebar"><span id="topicLabel"></span><span id="scoreLabel">Score: 0</span></div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="card" id="card"></div>
+
+<div class="nav">
+  <button id="nextBtn" onclick="next()" disabled>Next →</button>
+</div>
+<div class="shortcuts">Press 1–4 to answer · Enter/→ for next question</div>
+
+<script>
+const quiz = [
+{ type: "micro", topic: "Strategy definition",
+  q: "In extensive-form game theory, a <b>strategy</b> for a player is best defined as:",
+  opts: ["A complete contingent plan specifying an action at every information set where the player moves, including nodes that may never be reached.", "The single action the player takes at his first decision node.", "Any mixed probability distribution over the player's pure actions.", "The sequence of actions the player actually takes along the equilibrium path."],
+  correct: 0,
+  explain: "<span class=\"verdict\">A strategy is a complete contingent plan — it must specify actions everywhere, even off-path.</span>\nThe key word is <i>complete</i>: off-path actions matter for checking credibility in SPNE. Picking only the on-path action is insufficient; a mixed strategy is one special case, not the definition of strategy itself.<span class=\"ref\">Guide §4.2</span>"
+},
+{ type: "micro", topic: "Dominant strategy",
+  q: "Strategy $s_i$ is a <b>strictly dominant</b> strategy for player $i$ if:",
+  opts: ["It is the best response to the opponent playing a Nash equilibrium strategy.", "It gives $i$ a higher payoff than any other strategy, for <i>every</i> strategy profile of the opponents.", "No opponent has an incentive to deviate from it.", "It maximizes the sum of all players' payoffs."],
+  correct: 1,
+  explain: "<span class=\"verdict\">Strict dominance means strictly better regardless of what opponents do.</span>\nThe definition is unconditional: $u_i(s_i, s_{-i}) \\gt u_i(s_i', s_{-i})$ for all $s_{-i}$. Being a best response only to a Nash strategy is a much weaker condition. Maximizing the social sum is a social-planner concept, not an individual dominance concept.<span class=\"ref\">Guide §4.1</span>"
+},
+{ type: "micro", topic: "IDSDS and dominated strategies",
+  q: "After one round of deleting strictly dominated strategies, a remaining strategy is guaranteed to be:",
+  opts: ["A Nash equilibrium strategy.", "A strictly dominant strategy.", "A best response to at least one belief over opponents' strategies.", "The unique survivor of iterated deletion."],
+  correct: 2,
+  explain: "<span class=\"verdict\">A strategy survives strict-dominance deletion if and only if it is a best response to some belief — these two concepts are equivalent.</span>\nA strictly dominated strategy is never a best response to any belief, so survivors are always best responses to something. A surviving strategy need not be dominant or a NE strategy — those are stronger requirements. Iterated deletion may leave multiple strategies.<span class=\"ref\">Guide §4.1</span>"
+},
+{ type: "micro", topic: "Nash equilibrium definition",
+  q: "A strategy profile $(s_1^*, s_2^*)$ is a <b>Nash equilibrium</b> if and only if:",
+  opts: ["Both players receive the highest possible total payoff.", "No player has a strictly dominant strategy.", "Both players are playing mixed strategies that make the opponent indifferent.", "Each player's strategy is a best response to the other player's strategy."],
+  correct: 3,
+  explain: "<span class=\"verdict\">Nash equilibrium: mutual best responses — no one wants to deviate given what the other is doing.</span>\nNE does not require maximum total payoffs (the prisoner's dilemma NE is inefficient). Players need not be indifferent; that describes a mixed NE specifically, not NE in general. The absence of dominant strategies is a different condition unrelated to the NE definition.<span class=\"ref\">Guide §4.1</span>"
+},
+{ type: "micro", topic: "Best response and mixed NE",
+  q: "In a mixed-strategy Nash equilibrium, player $i$'s mixing probabilities are pinned down by:",
+  opts: ["Maximizing $i$'s own expected payoff over the mixing probability.", "The condition that the opponent is indifferent across the pure strategies in the opponent's support.", "The requirement that $i$ prefers one strategy but randomizes to hide intent.", "The condition that both players receive equal payoffs in expectation."],
+  correct: 1,
+  explain: "<span class=\"verdict\">Your mix makes your <i>opponent</i> indifferent — that is what pins down your mixing probability.</span>\nPlayer $i$'s mixing probabilities are chosen so that the opponent is exactly indifferent; otherwise the opponent would not mix. Player $i$ must personally be indifferent too — but the numerical probabilities are solved from the opponent's indifference condition. The guide lists this explicitly in the deduction list.<span class=\"ref\">Guide §4.1</span>"
+},
+{ type: "micro", topic: "Reading a payoff matrix — prisoner's dilemma NE",
+  q: "Find the unique pure-strategy Nash equilibrium in the game below (Row player's payoff listed first).<br><br><table><tr><th></th><th>C</th><th>D</th></tr><tr><th>A</th><td>3, 3</td><td>0, 4</td></tr><tr><th>B</th><td>4, 0</td><td>1, 1</td></tr></table>",
+  opts: ["(A, C) only.", "(A, C) and (B, D).", "There are no pure-strategy Nash equilibria.", "(B, D) only."],
+  correct: 3,
+  explain: "<span class=\"verdict\">(B, D) is the unique pure NE — the dominant-strategy outcome of this prisoner's dilemma.</span>\nAt (B, D): Row gets 1; switching to A gives 0 — no gain. Column gets 1; switching to C gives 0 — no gain. At (A, C): Row prefers B (4 vs 3), so (A, C) fails the NE check. Defect (B or D) strictly dominates for each player.<span class=\"ref\">Guide §4.1</span>"
+},
+{ type: "micro", topic: "Prisoner's dilemma structure",
+  q: "The prisoner's dilemma is a game in which the unique NE is Pareto inferior because:",
+  opts: ["Defecting is a strictly dominant strategy for each player, so mutual defection is the NE even though mutual cooperation gives both players a higher payoff.", "Both players prefer to randomize rather than play a pure strategy.", "Cooperation is a Nash equilibrium but players irrationally choose to defect.", "The game has no pure-strategy Nash equilibrium."],
+  correct: 0,
+  explain: "<span class=\"verdict\">Defect strictly dominates cooperate for each player, yielding a NE that both rank below mutual cooperation.</span>\nBecause defect is strictly dominant, IDSDS pins down mutual defection as the unique NE. Mutual cooperation gives higher payoffs to both but is not a NE — each player would want to deviate to defect. There is no mixing issue; dominant strategies remove all ambiguity.<span class=\"ref\">Guide §3.5</span>"
+},
+{ type: "micro", topic: "Coordination game / Battle of the Sexes",
+  q: "A <b>Battle of the Sexes</b>-style coordination game is distinguished from a prisoner's dilemma because:",
+  opts: ["It has a unique Nash equilibrium, whereas the prisoner's dilemma has many.", "One player has a strictly dominant strategy and the other does not.", "The socially optimal outcome is never a Nash equilibrium.", "There are multiple pure Nash equilibria and players have conflicting preferences over which one to reach, but both prefer coordinating on any equilibrium to miscoordinating."],
+  correct: 3,
+  explain: "<span class=\"verdict\">Coordination games have multiple pure NE and a selection conflict, not a cooperation conflict.</span>\nIn Battle of the Sexes there are two pure NE and a mixed NE; both players prefer either pure NE to miscoordinating. The prisoner's dilemma has a unique pure NE. In coordination games neither player has a strictly dominant strategy.<span class=\"ref\">Guide §4.1</span>"
+},
+{ type: "micro", topic: "Zero-sum games",
+  q: "In a <b>zero-sum</b> two-player game:",
+  opts: ["The payoffs of the two players sum to zero in every outcome, so one player's gain is exactly the other's loss.", "Both players can simultaneously gain by coordinating.", "There is always a dominant strategy for at least one player.", "Mixed strategy equilibria do not exist."],
+  correct: 0,
+  explain: "<span class=\"verdict\">Zero-sum means $u_1 + u_2 = 0$ in every cell — pure conflict, no joint gains possible.</span>\nZero-sum rules out mutual gains, so coordination is impossible. Dominant strategies need not exist (e.g., matching pennies has none). Mixed strategy NE always exist in finite games by Nash's theorem, including zero-sum games like matching pennies.<span class=\"ref\">Guide §4.1</span>"
+},
+{ type: "micro", topic: "Backward induction",
+  q: "Backward induction in a finite game of perfect information works by:",
+  opts: ["Starting from the first mover and tracing the optimal path forward.", "Assigning beliefs at every information set and checking sequential rationality.", "Identifying all Nash equilibria and selecting the one with highest total payoff.", "Starting at the terminal nodes, finding the optimal action at each penultimate node, and folding payoffs back toward the root."],
+  correct: 3,
+  explain: "<span class=\"verdict\">Backward induction solves from the end of the tree toward the beginning.</span>\nYou start at the last decision nodes, determine the optimal action, replace the subgame with that payoff, and repeat. This is distinct from belief assignment (which describes PBE). The resulting strategy profile is an SPNE by construction.<span class=\"ref\">Guide §4.2</span>"
+},
+{ type: "micro", topic: "SPNE vs NE — credible threats",
+  q: "A Nash equilibrium that is <b>not</b> a Subgame Perfect NE is characterized by:",
+  opts: ["A non-credible threat — a strategy that would not be optimal in some proper subgame.", "The use of mixed strategies.", "An absence of any NE in the normal form.", "Multiple players receiving equal payoffs."],
+  correct: 0,
+  explain: "<span class=\"verdict\">NE can rely on off-path threats the player would never carry out — SPNE rules those out by requiring optimality in every subgame.</span>\nClassic example: an employer threatens to reject all offers. This deters low wages on path but the employer would accept a profitable offer off path — the threat is non-credible. The guide: \"name the subgame where the threat breaks\" earns the point.<span class=\"ref\">Guide §4.2</span>"
+},
+{ type: "micro", topic: "Extensive form and information sets",
+  q: "An <b>information set</b> in an extensive-form game is a collection of decision nodes where:",
+  opts: ["The player moving there has already observed all previous actions.", "The player moving there cannot distinguish among those nodes based on available information.", "Multiple players must move simultaneously at each node.", "The payoffs at every node in the set are identical."],
+  correct: 1,
+  explain: "<span class=\"verdict\">An information set groups nodes the player cannot tell apart — she knows she is at one of them but not which.</span>\nIf a player could distinguish all nodes, each would be a singleton information set (perfect information). The extensive form adds this tree structure — timing, sequencing, and information sets — which the normal-form payoff matrix loses. Payoffs need not match across nodes in the set.<span class=\"ref\">Guide §4.2</span>"
+},
+{ type: "micro", topic: "Incomplete information and Bayesian types",
+  q: "In a <b>Bayesian game</b> of incomplete information, a player's <b>type</b> encodes:",
+  opts: ["The player's equilibrium strategy in the repeated version of the game.", "The history of actions the player has taken in previous rounds.", "Private payoff-relevant information — such as her cost or valuation — that is unknown to other players.", "The player's rank in the social hierarchy."],
+  correct: 2,
+  explain: "<span class=\"verdict\">A type captures all private payoff-relevant information — cost, value, quality — that creates the incomplete-information structure.</span>\nIncomplete information means uncertainty about types, not about move history (that is imperfect information). Each player knows her own type and has a prior over opponents' types. A strategy in a Bayesian game maps types to actions.<span class=\"ref\">Guide §4.1</span>"
+},
+{ type: "micro", topic: "Cournot vs Bertrand — strategic variable",
+  q: "The key difference between <b>Cournot</b> and <b>Bertrand</b> competition is:",
+  opts: ["Cournot is a sequential game; Bertrand is a simultaneous game.", "Cournot applies only when products are differentiated; Bertrand applies only to identical goods.", "Cournot firms choose price simultaneously; Bertrand firms choose quantity simultaneously.", "Cournot firms choose quantity simultaneously; Bertrand firms choose price simultaneously."],
+  correct: 3,
+  explain: "<span class=\"verdict\">Cournot: quantities are the strategic variable. Bertrand: prices are the strategic variable.</span>\nThis drives very different equilibrium outcomes: Cournot yields positive profits above marginal cost, while Bertrand with identical goods drives price to marginal cost ($\\pi^N = 0$). Both are simultaneous-move games in their standard forms; product differentiation is not part of the definition of either.<span class=\"ref\">Guide §4.1</span>"
+},
+{ type: "micro", topic: "Cournot best response and equilibrium output",
+  q: "Firm 1 in a Cournot duopoly has profit $\\pi_1 = (a - q_1 - q_2 - c)q_1$. The best-response function and symmetric equilibrium quantity are:",
+  opts: ["BR: $q_1 = \\frac{a - c - q_2}{2}$; symmetric NE: $q^* = \\frac{a-c}{3}$.", "BR: $q_1 = a - c - q_2$; symmetric NE: $q^* = \\frac{a-c}{2}$.", "BR: $q_1 = \\frac{a-c}{2}$; symmetric NE: $q^* = \\frac{a-c}{2}$.", "BR: $q_1 = \\frac{a - c - 2q_2}{3}$; symmetric NE: $q^* = \\frac{a-c}{5}$."],
+  correct: 0,
+  explain: "<span class=\"verdict\">FOC gives $a - 2q_1 - q_2 - c = 0 \\Rightarrow q_1 = \\frac{a-c-q_2}{2}$; symmetry yields $q^* = \\frac{a-c}{3}$.</span>\nThe best-response slope is $-\\frac{1}{2}$ (strategic substitutes). Setting $q_2 = 0$ gives the monopoly response $\\frac{a-c}{2}$; imposing $q_1 = q_2$ in the two BRs solves to $\\frac{a-c}{3}$. Per-firm Cournot profit is $\\frac{(a-c)^2}{9}$.<span class=\"ref\">Guide §4.1</span>"
+},
+{ type: "micro", topic: "Stackelberg first-mover",
+  q: "In the Stackelberg duopoly with $P = a - Q$ and constant marginal cost $c$, the leader's equilibrium quantity and profit are:",
+  opts: ["$q_1 = \\frac{a-c}{3}$, $\\pi_1 = \\frac{(a-c)^2}{9}$ (same as symmetric Cournot).", "$q_1 = \\frac{a-c}{2}$, $\\pi_1 = \\frac{(a-c)^2}{8}$ (monopoly quantity, first-mover advantage).", "$q_1 = \\frac{a-c}{4}$, $\\pi_1 = \\frac{(a-c)^2}{16}$ (the follower's outcomes).", "$q_1 = a - c$, $\\pi_1 = 0$ (competitive outcome)."],
+  correct: 1,
+  explain: "<span class=\"verdict\">The leader substitutes the follower's best-response into her own profit and maximizes — this yields the monopoly quantity $\\frac{a-c}{2}$.</span>\nThe follower then produces $\\frac{a-c}{4}$ and earns $\\frac{(a-c)^2}{16}$. The leader earns $\\frac{(a-c)^2}{8}$, strictly more than Cournot $\\frac{(a-c)^2}{9}$ — this is the first-mover advantage.<span class=\"ref\">Guide §4.2</span>"
+},
+{ type: "micro", topic: "Bertrand outcome",
+  q: "In the standard Bertrand model with two firms, identical goods, and constant marginal cost $c$, the Nash equilibrium has:",
+  opts: ["Price equal to the monopoly level $\\frac{a+c}{2}$.", "Price halfway between monopoly price and marginal cost.", "Price equal to marginal cost $c$, with both firms earning zero profit.", "Price slightly above marginal cost, with each firm earning a small positive profit."],
+  correct: 2,
+  explain: "<span class=\"verdict\">Bertrand competition drives price to marginal cost — the \"Bertrand paradox\" — even with only two firms.</span>\nEach firm undercuts the other as long as price exceeds marginal cost, so the only NE is $p = c$ with zero profit. The guide records $\\pi^N = 0$ for Bertrand, which directly generates $\\delta^* = \\frac{\\pi^D - \\pi^M}{\\pi^D - 0} = \\frac{1}{2}$ in the repeated-game formula.<span class=\"ref\">Guide §3.5</span>"
+},
+{ type: "micro", topic: "Repeated games — why infinite horizon matters",
+  q: "Why can infinite repetition (with $\\delta \\lt 1$) sustain cooperation while finitely repeated play with a <b>unique</b> stage NE cannot?",
+  opts: ["Players in the infinite game are more patient, so they always cooperate regardless of $\\delta$.", "The infinite game has more stage-game Nash equilibria.", "In the finite game, backward induction unravels cooperation from the last period; with no last period, the unraveling argument has no starting point.", "Finite repetition is cooperative by assumption, while infinite repetition is competitive."],
+  correct: 2,
+  explain: "<span class=\"verdict\">Finite horizon + unique stage NE: backward induction unravels cooperation from $T$ back to period 1; infinite horizon has no terminal period to anchor the unraveling.</span>\nIn the last period of a finite game, players play the stage NE. Knowing that, period $T-1$ collapses too, and so on. With no last period, grim trigger can support cooperation for $\\delta \\ge \\delta^*$.<span class=\"ref\">Guide §3.5</span>"
+},
+{ type: "micro", topic: "Discount factor meaning",
+  q: "In a repeated game, a discount factor $\\delta$ close to 1 means:",
+  opts: ["Players care less about the future and are more likely to defect today.", "Players are more patient: future payoffs are weighted nearly as heavily as today's payoff, making future punishments an effective deterrent.", "The game will be repeated fewer times in expectation.", "The stage-game payoffs are larger in magnitude."],
+  correct: 1,
+  explain: "<span class=\"verdict\">$\\delta$ close to 1 means high patience — future punishments loom large, making collusion easier to sustain.</span>\nThe present value of a perpetual stream $\\pi$ per period is $\\frac{\\pi}{1-\\delta}$, which grows as $\\delta \\to 1$. A lower $\\delta$ implies impatience — future punishments are nearly worthless, so defecting today is attractive. Cooperation requires $\\delta \\ge \\delta^*$.<span class=\"ref\">Guide §3.5</span>"
+},
+{ type: "micro", topic: "Grim trigger strategy",
+  q: "The <b>grim trigger</b> strategy in an infinitely repeated game specifies:",
+  opts: ["Defect for a fixed number of periods as punishment, then return to cooperation.", "Cooperate as long as both players have cooperated in every past period; defect forever upon any deviation.", "Randomize between cooperate and defect with equal probability each period.", "Cooperate in odd periods, defect in even periods, regardless of history."],
+  correct: 1,
+  explain: "<span class=\"verdict\">Grim trigger: cooperate until the first deviation, then defect forever — the most severe credible punishment.</span>\nBecause punishment is permanent (reversion to the stage NE forever), grim trigger minimizes $\\delta^*$ among trigger strategies. A fixed punishment window is milder. The formula $\\delta^* = \\frac{\\pi^D - \\pi^M}{\\pi^D - \\pi^N}$ is derived under this permanent reversion.<span class=\"ref\">Guide §3.5</span>"
+},
+{ type: "micro", topic: "Computing delta* — one-step",
+  q: "Given $\\pi^D = 16$, $\\pi^M = 8$, $\\pi^N = 0$, the minimum discount factor $\\delta^*$ for grim-trigger collusion is:",
+  opts: ["$\\frac{1}{3}$", "$\\frac{1}{4}$", "$\\frac{3}{4}$", "$\\frac{1}{2}$"],
+  correct: 3,
+  explain: "<span class=\"verdict\">$\\delta^* = \\frac{\\pi^D - \\pi^M}{\\pi^D - \\pi^N} = \\frac{16-8}{16-0} = \\frac{8}{16} = \\frac{1}{2}$.</span>\nPlug directly into the formula: temptation gain $= \\pi^D - \\pi^M = 8$; total stakes $= \\pi^D - \\pi^N = 16$. Their ratio is $\\frac{1}{2}$ — the same as the Bertrand benchmark because $\\pi^N = 0$ in both cases. Any $\\delta \\ge \\frac{1}{2}$ sustains collusion.<span class=\"ref\">Guide §3.5</span>"
+},
+{ type: "micro", topic: "Folk theorem gist",
+  q: "The <b>Folk theorem</b> for infinitely repeated games states (informally) that:",
+  opts: ["For discount factors sufficiently close to 1, any feasible and individually rational payoff vector can be sustained as an SPNE.", "Every stage-game Nash equilibrium payoff is achieved in every period.", "Cooperation is impossible unless the stage game has multiple Nash equilibria.", "Players will always reach the Pareto-optimal outcome once the game is repeated."],
+  correct: 0,
+  explain: "<span class=\"verdict\">Folk theorem: with $\\delta$ near 1, the sustainable SPNE payoffs fill the feasible individually-rational region.</span>\n\"Individually rational\" means each player gets at least her minmax value — not necessarily the Nash payoff. \"Feasible\" means in the convex hull of stage-game payoffs. The Nash payoffs are one interior point of this region, not the boundary.<span class=\"ref\">Guide §3.5</span>"
+},
+{ type: "micro", topic: "Minmax value",
+  q: "The <b>minmax value</b> $\\underline{v}_i$ for player $i$ in a game is:",
+  opts: ["Player $i$'s Nash equilibrium payoff in the stage game.", "The average of $i$'s highest and lowest possible payoffs.", "The lowest payoff opponents can hold $i$ to when $i$ best-responds: $\\underline{v}_i = \\min_{s_{-i}} \\max_{s_i} u_i(s_i, s_{-i})$.", "Player $i$'s payoff when all players play their Nash equilibrium strategies."],
+  correct: 2,
+  explain: "<span class=\"verdict\">Minmax: opponents choose to minimize $i$'s payoff; $i$ does the best she can against that — it is the floor she can guarantee.</span>\nThe guide flags \"minmax $\\ne$ Nash payoff\" as a key deduction. In the Folk theorem, payoffs must strictly exceed the minmax vector for individual rationality. Options 1 and 4 both describe the Nash payoff, which is a different (usually higher) concept.<span class=\"ref\">Guide §3.5</span>"
+},
+{ type: "micro", topic: "Signaling — sender and receiver",
+  q: "In the Spence education signaling model, the <b>sender</b> and <b>receiver</b> are:",
+  opts: ["The firm (employer) is the sender; the worker is the receiver.", "The worker is the sender; the firm (employer) is the receiver.", "Both parties are senders in a symmetric information game.", "The government regulator is the sender; the market is the receiver."],
+  correct: 1,
+  explain: "<span class=\"verdict\">The worker (informed party) sends the signal (education choice); the firm (uninformed) receives it and sets wages.</span>\nThe worker has private information about productivity type ($\\theta_H$ or $\\theta_L$) and chooses education $e$ to signal type. The employer observes $e$, applies Bayes' rule, and offers a competitive wage equal to expected productivity. This is the canonical sender-receiver structure.<span class=\"ref\">Guide §3.6</span>"
+},
+{ type: "micro", topic: "Separating vs pooling equilibrium",
+  q: "In a <b>separating</b> signaling equilibrium (as opposed to pooling):",
+  opts: ["Both types of sender choose the same signal, so the receiver cannot infer type on path.", "No sender uses a costly signal; type is revealed costlessly.", "Different types choose different signals, so the receiver can perfectly infer type on path.", "The receiver ignores the signal and acts only on the prior probability of each type."],
+  correct: 2,
+  explain: "<span class=\"verdict\">Separating: different types send different signals, allowing the receiver to update beliefs to certainty on path.</span>\nIn pooling, both types send the same signal and the receiver cannot update beyond the prior. Separation requires signals to be differentially costly across types (single-crossing), so mimicry is unprofitable for the low type. If signals are costless, the guide notes separation is impossible — low types mimic for free.<span class=\"ref\">Guide §3.6</span>"
+},
+{ type: "micro", topic: "Single-crossing property",
+  q: "The <b>single-crossing property</b> in signaling means:",
+  opts: ["The receiver's indifference curves cross the sender's indifference curves exactly once.", "Two senders of the same type always send the same signal in equilibrium.", "The firm's belief is updated only once during the game.", "The marginal cost of the signal is lower for high types ($\\partial^2 c / \\partial e\\, \\partial\\theta \\lt 0$), making separation incentive-compatible."],
+  correct: 3,
+  explain: "<span class=\"verdict\">Single-crossing: $\\partial^2 c / \\partial e\\, \\partial\\theta \\lt 0$ — high types find signaling cheaper at the margin, so they can separate at a cost low types will not pay.</span>\nThis property ensures that if the high type is indifferent at some signal level, the low type strictly prefers the lower signal — the key to making separation incentive-compatible. The guide states \"no costly signal $\\Rightarrow$ no separation\" as the direct consequence when this fails.<span class=\"ref\">Guide §3.6</span>"
+},
+{ type: "micro", topic: "PBE on-path beliefs",
+  q: "In a Perfect Bayesian Equilibrium (PBE), beliefs <b>on the equilibrium path</b> must:",
+  opts: ["Be derived from Bayes' rule applied to the equilibrium strategies — posteriors are consistent with the strategies actually being played.", "Retain the prior regardless of the signal observed.", "Be the most pessimistic belief about the sender's type.", "Be any belief the receiver finds convenient, as long as she best-responds to it."],
+  correct: 0,
+  explain: "<span class=\"verdict\">On-path beliefs must be Bayesian-consistent with the equilibrium strategy profile — Bayes' rule is mandatory on the path.</span>\nOff the equilibrium path, beliefs are free — that degree of freedom is what allows pessimistic off-path beliefs to sustain pooling equilibria. The guide's S.B.S.I. checklist: Strategies, Beliefs (Bayes on path, free off path), Sequential rationality, Incentive constraints.<span class=\"ref\">Guide §3.6</span>"
+},
+{ type: "micro", topic: "Intuitive Criterion gist",
+  q: "The <b>Intuitive Criterion</b> (Cho-Kreps) eliminates a pooling PBE when there exists an off-path signal $s'$ such that:",
+  opts: ["The equilibrium payoff is below the minmax value for some type.", "The low type could never benefit from $s'$ even if treated as high type, but the high type gains from $s'$ if treated as high type.", "The receiver strictly prefers not to hire any worker at $s'$.", "The high type's signal cost exceeds the wage premium at $s'$."],
+  correct: 1,
+  explain: "<span class=\"verdict\">Both legs are required: the low type can never gain from the deviation even in the best case; the high type would gain if correctly identified.</span>\nUnder these two conditions, Cho-Kreps assigns probability 1 to the high type at $s'$. The high type then deviates, unraveling the pooling equilibrium. The guide insists on writing both legs explicitly — missing one leg loses marks.<span class=\"ref\">Guide §3.6</span>"
+},
+{ type: "micro", topic: "Reading a payoff matrix — coordination NE",
+  q: "Find all pure-strategy Nash equilibria in the coordination game below (Row player's payoff listed first).<br><br><table><tr><th></th><th>Left</th><th>Right</th></tr><tr><th>Up</th><td>2, 1</td><td>0, 0</td></tr><tr><th>Down</th><td>0, 0</td><td>1, 2</td></tr></table>",
+  opts: ["(Up, Left) only.", "There are no pure-strategy Nash equilibria.", "(Up, Left) and (Down, Right) are both pure Nash equilibria.", "(Down, Right) only."],
+  correct: 2,
+  explain: "<span class=\"verdict\">Both (Up, Left) and (Down, Right) are pure NE — a Battle of the Sexes structure with two asymmetric equilibria.</span>\nAt (Up, Left): Row gets 2; deviating to Down yields 0. Column gets 1; deviating to Right yields 0. At (Down, Right): Row gets 1; deviating to Up yields 0. Column gets 2; deviating to Left yields 0. Neither can gain by deviating unilaterally at either outcome. There is also a mixed NE.<span class=\"ref\">Guide §4.1</span>"
+},
+{ type: "micro", topic: "Reading a payoff matrix — dominant strategies",
+  q: "In the game below, which statement correctly identifies the dominant strategies (Row player's payoff listed first)?<br><br><table><tr><th></th><th>X</th><th>Y</th></tr><tr><th>T</th><td>4, 4</td><td>4, 2</td></tr><tr><th>B</th><td>2, 4</td><td>2, 2</td></tr></table>",
+  opts: ["T is strictly dominant for Row; X is strictly dominant for Column.", "B is strictly dominant for Row; Y is strictly dominant for Column.", "Row is indifferent; T only weakly dominates B.", "There is no dominant strategy for either player."],
+  correct: 0,
+  explain: "<span class=\"verdict\">Row earns 4 under T and 2 under B regardless of Column — T strictly dominates B. Column earns 4 under X and 2 under Y regardless of Row — X strictly dominates Y.</span>\nEach player has a strictly dominant strategy here, making (T, X) the unique NE by IDSDS. Option 3 is wrong because strict dominance holds ($4 \\gt 2$ in every column for Row); T's payoff varies across columns but always strictly beats B's payoff in the same column.<span class=\"ref\">Guide §4.1</span>"
+}
+];
+
+function shuffleQuiz() {
+  for (let i = quiz.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [quiz[i], quiz[j]] = [quiz[j], quiz[i]];
+  }
+}
+shuffleQuiz();
+let current = 0;
+let score = 0;
+let answered = false;
+const results = [];
+
+function render() {
+  const q = quiz[current];
+  const card = document.getElementById("card");
+  let html = '';
+  html += '<div class="card-meta"><span class="tag ' + q.type + '">' + (q.type === "metrics" ? "Econometrics" : "Microeconomics") + '</span><span class="topic-tag">' + q.topic + '</span></div>';
+  html += '<div class="question">Q' + (current+1) + '. ' + q.q + '</div>';
+  html += '<div class="options">';
+  const letters = ['A','B','C','D'];
+  for (let i = 0; i < q.opts.length; i++) {
+    html += '<button class="opt" id="opt'+i+'" onclick="pick('+i+')"><span class="letter">'+letters[i]+'</span><span>'+q.opts[i]+'</span></button>';
+  }
+  html += '</div>';
+  html += '<div class="explain" id="explain">' + q.explain + '</div>';
+  card.innerHTML = html;
+
+  answered = false;
+  document.getElementById("nextBtn").disabled = true;
+  document.getElementById("nextBtn").textContent = current === quiz.length - 1 ? "Finish ✓" : "Next →";
+  const pct = (current / quiz.length * 100).toFixed(0);
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("topicLabel").textContent = "Question " + (current+1) + " / " + quiz.length;
+  document.getElementById("scoreLabel").textContent = "Score: " + score;
+  if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([card]);
+}
+
+function pick(i) {
+  if (answered) return;
+  answered = true;
+  const q = quiz[current];
+  const right = i === q.correct;
+  if (right) score++;
+  results.push({ topic: q.topic, type: q.type, right: right });
+  for (let j = 0; j < q.opts.length; j++) {
+    const el = document.getElementById("opt" + j);
+    el.disabled = true;
+    if (j === q.correct) el.classList.add("correct");
+    else if (j === i) el.classList.add("wrong");
+    else el.classList.add("dim");
+  }
+  const ex = document.getElementById("explain");
+  ex.classList.add("visible");
+  document.getElementById("scoreLabel").textContent = "Score: " + score;
+  document.getElementById("nextBtn").disabled = false;
+  if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([ex]);
+}
+
+function next() {
+  if (!answered) return;
+  if (current < quiz.length - 1) { current++; render(); }
+  else finish();
+}
+
+function finish() {
+  const card = document.getElementById("card");
+  const pctScore = Math.round(score / quiz.length * 100);
+  let grade;
+  if (pctScore >= 90) grade = "As expected for a warm-up — you own the fundamentals.";
+  else if (pctScore >= 75) grade = "Solid — drill the misses below, then re-run.";
+  else if (pctScore >= 60) grade = "Passing-adjacent. The misses map to guide sections — restudy those first.";
+  else grade = "These are the freebies — review guide §3.5–§3.6 and §4.1–4.3 tonight, then re-run.";
+  let html = '<div class="bigscore">' + score + ' / ' + quiz.length + '</div>';
+  html += '<div class="grade">' + pctScore + '% — ' + grade + '</div>';
+  for (let i = 0; i < results.length; i++) {
+    const r = results[i];
+    html += '<div class="result-line"><span>Q' + (i+1) + ' · ' + (r.type === "metrics" ? "Metrics" : "Micro") + ' · ' + r.topic + '</span><span class="' + (r.right ? 'ok' : 'miss') + '">' + (r.right ? '✓' : '✗') + '</span></div>';
+  }
+  html += '<div class="nav" style="margin-top:16px"><button onclick="restart()">↻ Restart quiz</button></div>';
+  card.innerHTML = html;
+  document.getElementById("progressFill").style.width = "100%";
+  document.getElementById("topicLabel").textContent = "Done";
+  document.getElementById("nextBtn").disabled = true;
+}
+
+function restart() {
+  shuffleQuiz();
+  current = 0; score = 0; answered = false; results.length = 0;
+  render();
+}
+
+document.addEventListener("keydown", e => {
+  if (["1","2","3","4"].includes(e.key) && !answered) { pick(parseInt(e.key)-1); }
+  if ((e.key === "Enter" || e.key === "ArrowRight") && answered) next();
+});
+
+render();
+</script>
+</body>
+</html>
