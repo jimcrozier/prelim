@@ -67,7 +67,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 const quiz = [
 { type: "metrics", topic: "Two-way FE bias",
   q: "A researcher runs one-way unit-FE on $y_{it}=x_{it}'\\beta+c_i+\\lambda_t+u_{it}$, omitting time dummies. The plim of $\\hat\\beta_{FE}$ is:",
-  opts: ["$\\beta$, because unit demeaning removes all confounders", "$\\beta+(E[\\ddot x_{it}\\ddot x_{it}'])^{-1}E[\\ddot x_{it}c_i]$ — biased by unit effects", "$\\beta+(E[\\ddot x_{it}\\ddot x_{it}'])^{-1}E[\\ddot x_{it}(\\lambda_t-\\bar\\lambda)]$ — biased when $x_{it}$ co-moves with time shocks", "$\\beta$, provided time shocks have mean zero"],
+  opts: ["$\\beta$, because unit demeaning removes all confounders including time shocks", "$\\beta+(E[\\ddot x_{it}\\ddot x_{it}'])^{-1}E[\\ddot x_{it}c_i]$ — biased by residual unit effects after demeaning", "$\\beta+(E[\\ddot x_{it}\\ddot x_{it}'])^{-1}E[\\ddot x_{it}(\\lambda_t-\\bar\\lambda)]$", "$\\beta$, provided time shocks have mean zero and are uncorrelated across periods"],
   correct: 2,
   explain: "<span class=\"verdict\">Unit demeaning removes $c_i$ but not $\\lambda_t$; the residual shock $(\\lambda_t-\\bar\\lambda)$ biases FE if $\\ddot x_{it}$ co-moves with time shocks.</span>\nThe within-transformed error is $(\\lambda_t-\\bar\\lambda)+\\ddot u_{it}$. If regressors share a time pattern correlated with $\\lambda_t$, the bias is non-zero. The fix is two-way FE (adding time dummies). Mean-zero $\\lambda_t$ (fourth option) does not eliminate bias because $E[\\ddot x_{it}(\\lambda_t-\\bar\\lambda)]$ can be non-zero even when $E[\\lambda_t]=0$.<span class=\"ref\">Guide §4.5</span>"
 },
@@ -85,25 +85,25 @@ const quiz = [
 },
 { type: "metrics", topic: "Panel RE vs FE — Hausman test",
   q: "A Hausman test rejects its null in a panel FE/RE comparison. The correct conclusion is:",
-  opts: ["RE is more efficient; both are consistent (the null outcome, not the rejection outcome)", "Unit effects are correlated with regressors ($E[c_i|x_i]\\neq 0$) — RE is inconsistent and FE should be preferred", "Regressors are endogenous due to reverse causation; IV is needed", "The panel is unbalanced, causing RE inconsistency"],
+  opts: ["RE is more efficient; both are consistent — this describes the null outcome, not the rejection", "$E[c_i|x_i]\\neq 0$: unit effects correlate with regressors, making RE inconsistent", "Regressors are endogenous due to reverse causation; IV is needed instead of FE", "The panel is unbalanced, causing RE inconsistency through missing-at-random violations"],
   correct: 1,
   explain: "<span class=\"verdict\">Hausman rejection means $\\hat\\beta_{FE}$ and $\\hat\\beta_{RE}$ differ systematically, indicating $E[c_i|x_i]\\neq 0$ — the key RE assumption fails.</span>\nUnder the null, RE is consistent and efficient (first option describes the no-rejection case). Under the alternative, RE is inconsistent due to unit-effect–regressor correlation, while FE removes $c_i$ and remains consistent. The test statistic is $H=(\\hat\\beta_{FE}-\\hat\\beta_{RE})'(\\hat V_{FE}-\\hat V_{RE})^{-1}(\\hat\\beta_{FE}-\\hat\\beta_{RE})\\xrightarrow{d}\\chi^2_K$. Reverse causation and unbalance are separate issues.<span class=\"ref\">Guide §4.5</span>"
 },
 { type: "micro", topic: "Expected utility",
   q: "Ann ranks lotteries by $W(p) = EV(p) - \\mathrm{Var}(p)$. Which is true?",
-  opts: ["No utility representation exists — the relation is incomplete", "A utility representation exists AND it is an EU representation", "It is an EU representation with Bernoulli utility $u(z)=z-z^2$", "A utility representation exists, but it is NOT EU — variance is quadratic in $p$, violating independence"],
+  opts: ["No utility representation exists — the relation is incomplete because variance creates indifference cycles", "A utility representation exists AND it is a valid EU representation with $u(z)=z-z^2$", "It is an EU representation with Bernoulli utility $u(z)=z-z^2$, since $E[u]=EV-\\text{Var}$ algebraically", "A utility representation exists, but it is NOT EU — variance is quadratic in $p$"],
   correct: 3,
   explain: "<span class=\"verdict\">Complete and transitive (it's a real-valued score) — so a utility rep exists — but not linear in $p$.</span>\n$\\mathrm{Var}(\\alpha p+(1-\\alpha)r)\\neq\\alpha\\mathrm{Var}(p)+(1-\\alpha)\\mathrm{Var}(r)$, so independence fails. Contrast with the AND-criterion (higher mean AND lower variance), which is incomplete and has no utility rep at all — that's option (a)'s scenario, not this one.<span class=\"ref\">Guide §3.4</span>"
 },
 { type: "metrics", topic: "Selection bias — decomposition",
   q: "In the naive comparison $E[Y|D=1]-E[Y|D=0]=\\text{ATT}+\\text{selection bias}$, the selection-bias term equals:",
-  opts: ["$E[Y(1)|D=1]-E[Y(1)|D=0]$", "$E[Y(1)-Y(0)|D=0]$ — the ATE for the untreated", "$E[Y|D=1]-E[Y(0)|D=1]$ — the ATT itself", "$E[Y(0)|D=1]-E[Y(0)|D=0]$ — difference in untreated baseline potential outcomes between groups"],
+  opts: ["$E[Y(1)|D=1]-E[Y(1)|D=0]$ — gap in treated potential outcomes across groups", "$E[Y(1)-Y(0)|D=0]$ — the ATE for the untreated group", "$E[Y|D=1]-E[Y(0)|D=1]$ — the ATT itself, not the bias term", "$E[Y(0)|D=1]-E[Y(0)|D=0]$ — baseline counterfactual gap"],
   correct: 3,
   explain: "<span class=\"verdict\">Selection bias $=E[Y(0)|D=1]-E[Y(0)|D=0]$ — the pre-existing baseline gap in untreated potential outcomes between who chose treatment and who did not.</span>\nThe decomposition adds and subtracts $E[Y(0)|D=1]$: the result is ATT + selection bias where selection bias $=E[Y(0)|D=1]-E[Y(0)|D=0]$. The first option compares treated potential outcomes, a different quantity. The third option is the ATT itself, not the selection-bias component.<span class=\"ref\">Guide §3.3</span>"
 },
 { type: "micro", topic: "Counterexample bank",
   q: "Lexicographic preferences on $\\mathbb{R}^2$ are the canonical counterexample showing:",
-  opts: ["Complete + transitive preferences can fail continuity (and lack a utility representation)", "Transitive preferences can fail completeness", "Complete preferences can fail transitivity", "Continuous preferences can fail transitivity"],
+  opts: ["Complete + transitive preferences can fail continuity", "Transitive preferences can fail completeness — shown by strict partial orders on infinite sets", "Complete preferences can fail transitivity — shown by Condorcet-style majority aggregation", "Continuous preferences can fail transitivity — shown by intransitive indifference with just-noticeable differences"],
   correct: 0,
   explain: "<span class=\"verdict\">Complete ✓, transitive ✓, continuous ✗.</span>\nThe sequence $x^n=(1-\\frac{1}{n},1)\\to(1,1)$ with $y=(1,0)$: every $x^n\\prec y$ but the limit $\\succ y$ — upper contour sets aren't closed. Condorcet cycles are the complete-not-transitive example; Pareto partial orders are transitive-not-complete. Keep the bank straight.<span class=\"ref\">Guide §3.3</span>"
 },
@@ -151,19 +151,19 @@ const quiz = [
 },
 { type: "metrics", topic: "RDD — McCrary density test",
   q: "A researcher finds a sharp discontinuity in the density of the running variable at the RDD cutoff. The implication is:",
-  opts: ["Agents are precisely manipulating the running variable — a violation of the continuity assumption that invalidates causal inference", "Bandwidth is too narrow; widening it will smooth out the discontinuity", "Outcome outliers near the cutoff should be excluded", "The running variable should be log-transformed before applying RDD"],
+  opts: ["Agents are sorting precisely around the cutoff — invalidating causal inference", "Bandwidth is too narrow; widening it eliminates the apparent discontinuity because density is smooth globally", "Outcome outliers just above and below the cutoff are inflating the density estimate near $c$ and should be trimmed", "The running variable has a skewed distribution near $c$; log-transforming it normalizes density and removes the jump"],
   correct: 0,
   explain: "<span class=\"verdict\">A density discontinuity (McCrary test) indicates selective sorting at the cutoff: units just above and below are not comparable, violating the continuity assumption.</span>\nIf agents can precisely control whether they exceed the cutoff, potential outcomes are not continuous at $c$ and the RDD estimate is biased. Widening the bandwidth does not repair the underlying selection problem. Trimming or transforming the running variable does not address who chooses to be on which side of $c$.<span class=\"ref\">Guide §4.7</span>"
 },
 { type: "metrics", topic: "Driscoll–Kraay standard errors",
   q: "When should a researcher use Driscoll–Kraay SEs instead of standard unit-cluster-robust SEs in a panel?",
-  opts: ["When errors exhibit cross-sectional dependence at the same time period (common macro shocks), in addition to within-unit serial correlation", "When the panel is unbalanced with many missing periods", "When the number of clusters is large relative to sample size", "When the outcome variable is binary"],
+  opts: ["When errors exhibit both cross-sectional dependence and within-unit serial correlation", "When the panel is strongly unbalanced — many missing periods cause standard cluster SEs to be unreliable", "When the number of clusters is large relative to sample size, so standard asymptotics over-reject", "When the outcome variable is binary and heteroskedasticity of a logit-type form is likely"],
   correct: 0,
   explain: "<span class=\"verdict\">Driscoll–Kraay handles both within-unit serial correlation and cross-unit contemporaneous dependence (spatial or common-shock).</span>\nStandard cluster-robust SEs allow arbitrary within-cluster correlation but assume independence across clusters. When all firms are hit by the same macro shock in period $t$, cross-unit covariances at the same period are non-zero and cluster SEs understate uncertainty. Driscoll–Kraay uses a spatial-HAC approach over time. Unbalance, many clusters, and binary outcomes are separate issues.<span class=\"ref\">Guide §4.5</span>"
 },
 { type: "micro", topic: "Mean-variance EU failure",
   q: "Criterion $W(p)=E_p[z]-\\text{Var}_p(z)$ has a utility representation but NOT an EU representation. Why?",
-  opts: ["$W$ is not monotone in FOSD.", "$W$ contains $(\\sum z\\,p(z))^2$, which is quadratic in $p$, violating independence.", "$W$ lacks transitivity.", "$W$ is not continuous in $p$."],
+  opts: ["$W$ is not monotone: adding a dominant outcome can lower $W$ by raising variance.", "$W$ contains $(\\sum z\\,p(z))^2$, quadratic in $p$, violating independence.", "$W$ lacks transitivity because the real-valued score produces cycles under compound lotteries.", "$W$ is not continuous: small probability shifts near integer prizes create discontinuous variance jumps."],
   correct: 1,
   explain: "<span class=\"verdict\">$W$ assigns real numbers to lotteries (complete, transitive — utility rep exists). But $\\text{Var}_p(z)=(\\sum z^2 p(z))-(\\sum z\\,p(z))^2$; the term $(\\sum z\\,p(z))^2$ is quadratic in $p$, making $W$ nonlinear and violating independence.</span>\nFOSD monotonicity is not the relevant failure here. Transitivity holds since $W$ is real-valued. $W$ is polynomial in probabilities — continuous. The specific failure is the quadratic variance term breaking linearity in $p$.<span class=\"ref\">Guide §3.4, §6 item 6</span>"
 },
@@ -193,7 +193,7 @@ const quiz = [
 },
 { type: "metrics", topic: "Panel FE — strict exogeneity",
   q: "FE requires strict exogeneity $E[u_{it}|x_{i1},\\ldots,x_{iT},c_i]=0$. Why does $x_{it}=y_{i,t-1}$ violate this?",
-  opts: ["$y_{i,t-1}$ is mechanically correlated with the unit effect $c_i$", "$u_{it}$ affects $y_{it}=x_{i,t+1}$, so future regressors depend on current errors — violating strict exogeneity (Nickell bias)", "Demeaning induces negative serial correlation in the transformed error", "Lagged variables cannot appear in a balanced panel"],
+  opts: ["$y_{i,t-1}$ is mechanically correlated with $c_i$, which FE already eliminates by demeaning", "$u_{it}$ affects $x_{i,t+1}=y_{it}$, so future regressors depend on current errors — strict exogeneity fails", "Demeaning creates negative serial correlation in the transformed error, biasing the variance estimate", "Lagged dependent variables require unbalanced panels; $y_{i,t-1}$ is undefined at $t=1$ in balanced data"],
   correct: 1,
   explain: "<span class=\"verdict\">Strict exogeneity requires $u_{it}$ to be uncorrelated with all lags and leads of $x$; since $x_{i,t+1}=y_{it}$ depends on $u_{it}$, the assumption fails.</span>\nThe within transformation constructs $\\ddot x_{it}$ using all time periods including $x_{i,t+1},\\ldots,x_{iT}$, which depend on $u_{it}$ via the dynamic process. The first option: FE removes $c_i$ by construction, so correlation with $c_i$ is not the strict-exogeneity violation. The fix is Arellano–Bond GMM using lagged levels as instruments.<span class=\"ref\">Guide §4.5</span>"
 },
@@ -205,7 +205,7 @@ const quiz = [
 },
 { type: "metrics", topic: "Measurement error — forgotten IV condition",
   q: "Under CEV, a second noisy measure $z=x+\\eta$ ($\\eta$ independent of $\\varepsilon$, $u$, $x$) is proposed as an instrument. Which condition is most often forgotten?",
-  opts: ["$\\text{Cov}(z,x)\\neq 0$ (relevance)", "$\\text{Cov}(z,u)=0$ (exclusion from structural error)", "$E[\\eta]=0$ (mean-zero noise in the instrument)", "$\\text{Cov}(z,\\varepsilon)=0$ (instrument uncorrelated with measurement error in $x^*$)"],
+  opts: ["$\\text{Cov}(z,x)\\neq 0$ (relevance) — usually checked with a first-stage $F$-test", "$\\text{Cov}(z,u)=0$ (exclusion from the structural equation error)", "$E[\\eta]=0$ (mean-zero measurement noise in the instrument)", "$\\text{Cov}(z,\\varepsilon)=0$ (measurement noise uncorrelated with $y$-equation error)"],
   correct: 3,
   explain: "<span class=\"verdict\">$\\text{Cov}(z,\\varepsilon)=0$ is the most-often-forgotten condition — explicitly flagged as a named deduction in the guide.</span>\nRelevance and structural exclusion are standard conditions students recall. But because $z$ is a noisy measure of $x$, if $\\text{Cov}(\\eta,\\varepsilon)\\neq 0$ then $\\text{Cov}(z,x^*)\\neq\\text{Cov}(z,x)$ and the IV estimator does not recover $\\beta_1$. Mean-zero noise (third option) is a CEV normalization, not the critical validity condition.<span class=\"ref\">Guide §4.1</span>"
 },
@@ -223,7 +223,7 @@ const quiz = [
 },
 { type: "metrics", topic: "Holm vs Bonferroni",
   q: "Both Holm step-down and Bonferroni correction control FWER at $\\alpha$. Which statement is correct?",
-  opts: ["Bonferroni is uniformly more powerful than Holm", "Holm is uniformly more powerful but requires tests to be independent", "They are numerically identical for any data set", "Holm is uniformly more powerful and, like Bonferroni, requires no independence assumption"],
+  opts: ["Bonferroni is uniformly more powerful than Holm — its fixed threshold rejects more hypotheses", "Holm is uniformly more powerful but requires tests to be independent to maintain FWER control", "They are numerically identical for any data set when the smallest $p$-value equals $\\alpha/m$", "Holm is uniformly more powerful and requires no independence assumption to control FWER"],
   correct: 3,
   explain: "<span class=\"verdict\">Holm dominates Bonferroni: it controls FWER via the union bound (no independence required) and rejects at least as many hypotheses in every data set.</span>\nHolm's step-down compares the $k$-th smallest $p$-value to $\\alpha/(m-k+1)$, a less stringent threshold than Bonferroni's uniform $\\alpha/m$ for all but the smallest $p$-value. Both use only the union bound — neither requires independence (second option is wrong). They are not numerically identical in general (third option).<span class=\"ref\">Guide §4.3</span>"
 },
@@ -247,13 +247,13 @@ const quiz = [
 },
 { type: "micro", topic: "Stochastic Stackelberg value of information",
   q: "Stochastic Stackelberg: demand intercept is $a\\gt0$ w.p. $1/2$ and $0$ w.p. $1/2$. Leader profit when follower is informed vs uninformed:",
-  opts: ["Leader earns the same regardless.", "$a^2/27\\gt a^2/32$: leader earns more when follower is informed (informed follower scales back in the bad state, sheltering leader).", "Leader earns more when follower is uninformed ($a^2/32\\gt a^2/27$).", "Follower information only affects follower profit."],
+  opts: ["Leader earns the same regardless — follower information shifts only the follower's payoff.", "$a^2/27\\gt a^2/32$: leader earns more when follower is informed; informed follower shelters leader in the zero-demand state.", "Leader earns more when follower is uninformed because uncertainty reduces rival output — $a^2/32\\gt a^2/27$.", "Follower information only affects follower profit; the leader commits first and is immune to it."],
   correct: 1,
   explain: "<span class=\"verdict\">Informed follower produces zero in the zero-demand state and less in the high state, sheltering the leader. Expected leader profit $a^2/27\\gt a^2/32$ — a counterintuitive result.</span>\nThe third option inverts the comparison: $a^2/32\\lt a^2/27$. Leader profit is not invariant — follower best responses affect market price, anticipated via backward induction. Follower information propagates directly to the leader's residual demand.<span class=\"ref\">Guide §4.3</span>"
 },
 { type: "metrics", topic: "RDD — sharp vs fuzzy",
   q: "In a fuzzy RDD, $E[D|X=x]$ jumps from 0.2 to 0.8 at cutoff $c$. The estimand $\\tau_F$ equals:",
-  opts: ["The reduced-form jump in $E[Y|X]$ at $c$ alone", "The ATE for the full population near the cutoff", "The sharp RDD estimand multiplied by $P(D=1|X=c)$", "The reduced-form jump in $E[Y|X]$ at $c$ divided by the first-stage jump $0.6$, identifying LATE for cutoff compliers"],
+  opts: ["The reduced-form jump in $E[Y|X]$ at $c$ alone, without scaling by compliance", "The ATE for all units near the cutoff, recoverable via inverse-probability weighting near $c$", "The sharp RDD estimand multiplied by the first-stage jump $P(D=1|X=c)$ to account for non-compliance", "The reduced-form jump in $E[Y|X]$ at $c$ divided by the first-stage jump $0.6$"],
   correct: 3,
   explain: "<span class=\"verdict\">Fuzzy RDD is IV at the cutoff: reduced form $\\div$ first stage ($0.6$) recovers the LATE for units whose treatment changes at the threshold.</span>\nThe first option is the reduced form only — the numerator of the Wald ratio. For sharp RDD the first stage is 1, so reduced form equals the effect directly. With a partial jump of 0.6, dividing by 0.6 recovers the LATE for cutoff compliers. ATE (second option) requires both potential outcomes for all units near $c$, not available here.<span class=\"ref\">Guide §4.7</span>"
 },
@@ -265,7 +265,7 @@ const quiz = [
 },
 { type: "metrics", topic: "IV — weak instruments",
   q: "When the first-stage $F$-statistic is below 10, which statement best describes the consequence for 2SLS?",
-  opts: ["2SLS is unbiased but has inflated standard errors", "2SLS is inconsistent because the relevance condition fails", "2SLS finite-sample bias is directed toward OLS and standard asymptotic CIs are anti-conservative (too narrow)", "2SLS SEs are too wide, so inference is valid though inefficient"],
+  opts: ["2SLS is unbiased but has inflated standard errors that overstate estimation uncertainty", "2SLS is inconsistent because a small first-stage $F$ implies the relevance condition is violated asymptotically", "2SLS finite-sample bias toward OLS; first-order asymptotic CIs are anti-conservative", "2SLS SEs are too wide when instruments are weak, so the test is conservative and inference remains valid"],
   correct: 2,
   explain: "<span class=\"verdict\">Weak instruments cause 2SLS finite-sample bias toward OLS and make first-order asymptotic confidence intervals anti-conservative.</span>\nThe first option is wrong: 2SLS is consistent but not unbiased, and weak instruments amplify bias toward OLS. The second option confuses a near-zero first stage with an exact zero. With a near-zero denominator in the Wald ratio, the normal approximation fails: CIs are too narrow and point estimates are contaminated by OLS-style endogeneity bias.<span class=\"ref\">Guide §3.5</span>"
 },
@@ -277,7 +277,7 @@ const quiz = [
 },
 { type: "metrics", topic: "Staggered DiD",
   q: "With staggered adoption and heterogeneous dynamic treatment effects, plain two-way FE can be badly biased even under exact parallel trends. Why?",
-  opts: ["Because parallel trends is untestable", "Because the TWFE estimand puts negative weights on some ATT$(g,t)$ — already-treated units serve as controls", "Because clustering fails with staggered timing", "Because ATT$(g,t)$ is not identified under parallel trends"],
+  opts: ["Because parallel trends is untestable in the post-period — any bias survives pre-trend tests", "Because the TWFE estimand puts negative weights on some ATT$(g,t)$ when effects are heterogeneous", "Because clustering by cohort fails with staggered timing, inflating standard errors", "Because ATT$(g,t)$ is not identified under parallel trends without a never-treated comparison group"],
   correct: 1,
   explain: "<span class=\"verdict\">It's a weighting problem, not a trends problem.</span>\nTWFE compares newly-treated to already-treated units whose effects are still evolving; the implied weights on the ATT$(g,t)$ building blocks can be negative, flipping signs in the aggregate. Remedies to name: Callaway–Sant'Anna, Sun–Abraham.<span class=\"ref\">Guide §4.4</span>"
 },
@@ -289,7 +289,7 @@ const quiz = [
 },
 { type: "metrics", topic: "FWL theorem",
   q: "The Frisch–Waugh–Lovell theorem states that in $Y=X_1\\beta_1+X_2\\beta_2+e$, $\\hat\\beta_1$ equals:",
-  opts: ["The OLS coefficient in the short regression of $Y$ on $X_1$ alone", "The OLS coefficient in the regression of $M_2 Y$ on $M_2 X_1$, where $M_2=I-X_2(X_2'X_2)^{-1}X_2'$", "The coefficient from the regression of $Y$ on $P_2 X_1$", "$(X_1'X_1)^{-1}X_1'Y$ regardless of $X_2$"],
+  opts: ["The OLS coefficient from the short regression of $Y$ on $X_1$ alone, equal to $\\hat\\beta_1$ only when $X_1\\perp X_2$", "The OLS coefficient from regressing $M_2 Y$ on $M_2 X_1$, where $M_2=I-P_2$ annihilates $X_2$", "The coefficient from the regression of $Y$ on $P_2 X_1$, using the projection rather than the annihilator", "$(X_1'X_1)^{-1}X_1'Y$ regardless of $X_2$, which equals $\\hat\\beta_1$ only if $X_2$ is uncorrelated with $X_1$"],
   correct: 1,
   explain: "<span class=\"verdict\">FWL: residualize both $Y$ and $X_1$ on $X_2$ using $M_2$, then regress $M_2 Y$ on $M_2 X_1$; the coefficient equals $\\hat\\beta_1$ from the full regression.</span>\nThe annihilator $M_2=I-P_2$ removes $X_2$'s variation from both sides. The first option gives the short-regression coefficient, which suffers OVB if $X_2$ and $X_1$ are correlated. The fourth option is the short-regression formula — equal to FWL only when $X_1\\perp X_2$.<span class=\"ref\">Guide §5 (FWL)</span>"
 },
@@ -301,7 +301,7 @@ const quiz = [
 },
 { type: "metrics", topic: "2SLS — by-hand standard errors",
   q: "A researcher runs 2SLS by hand and computes SEs from Stage 2 residuals $Y-\\hat X'\\hat\\delta$ (where $\\hat X$ are Stage 1 fitted values). What is the problem?",
-  opts: ["Controls must be excluded from Stage 2", "Stage 2 residuals use $\\hat X$ not actual $X$, understating residual variance; correct SEs require the 2SLS sandwich formula using true residuals $Y-X'\\hat\\beta_{2SLS}$", "Including $\\hat X$ creates perfect multicollinearity with controls in Stage 2", "Nothing is wrong; two-step OLS SEs are numerically identical to 2SLS SEs"],
+  opts: ["Controls must be excluded from Stage 2 to avoid over-fitting the first-stage projection", "Stage 2 residuals use $\\hat X$, not actual $X$, understating residual variance", "Including $\\hat X$ alongside controls in Stage 2 creates perfect multicollinearity, making the OLS system singular", "Nothing is wrong; the two-step OLS SEs equal 2SLS SEs when the sandwich accounts for first-stage estimation error"],
   correct: 1,
   explain: "<span class=\"verdict\">Substituting $\\hat X$ for $X$ in Stage 2 compresses residuals and understates variance; correct 2SLS inference requires the sandwich formula with true residuals.</span>\nControls must appear in both stages (first option is wrong). Perfect multicollinearity does not arise from fitted values alongside controls (third option is wrong). Two-step SEs equal correct 2SLS SEs only when the full sandwich is computed correctly — not with raw Stage 2 residuals (fourth option is wrong).<span class=\"ref\">Guide §3.5</span>"
 },
@@ -313,7 +313,7 @@ const quiz = [
 },
 { type: "metrics", topic: "MLE invariance",
   q: "You have $\\hat\\lambda_{MLE}=1/\\bar X$ for Exponential$(\\lambda)$. The MLE of the mean $\\mu=1/\\lambda$ is:",
-  opts: ["$1/\\bar X$ — by re-deriving the likelihood in the $\\mu$ parameterization", "$\\bar X$ — by the MLE invariance property: MLE of $g(\\lambda)$ is $g(\\hat\\lambda_{MLE})$", "$\\sqrt{\\bar X}$ — related to the exponential variance $1/\\lambda^2$", "Undefined — $\\mu$ and $\\lambda$ are not separately identified"],
+  opts: ["$1/\\bar X$ — by re-deriving the exponential likelihood directly in the $\\mu$ parameterization, confirming $\\hat\\mu=1/\\bar X$", "$\\bar X$ — MLE invariance: if $\\hat\\lambda=1/\\bar X$ then $\\hat\\mu=g(\\hat\\lambda)=\\bar X$", "$\\sqrt{\\bar X}$ — because exponential variance is $1/\\lambda^2$, so the MLE standard deviation equals $\\sqrt{\\bar X}$", "Undefined — $\\mu$ and $\\lambda$ are separately identified, but their MLEs differ after the Jacobian correction"],
   correct: 1,
   explain: "<span class=\"verdict\">MLE invariance: $g(\\hat\\theta)$ is the MLE of $g(\\theta)$; with $\\hat\\lambda=1/\\bar X$, the MLE of $\\mu=g(\\lambda)=1/\\lambda$ is $g(1/\\bar X)=\\bar X$.</span>\nThe first option re-derives directly — valid but laborious; invariance makes re-derivation unnecessary. The third option has no MLE interpretation. Invariance is one of the four key MLE properties: consistent, asymptotically normal with avar $I^{-1}$, asymptotically efficient, and invariant under reparameterization.<span class=\"ref\">Guide §4.2</span>"
 },
@@ -337,13 +337,13 @@ const quiz = [
 },
 { type: "metrics", topic: "Staggered DiD — ATT(g,t)",
   q: "In the Callaway–Sant'Anna framework, $\\text{ATT}(g,t)$ is defined as:",
-  opts: ["The treatment effect in calendar period $t$ pooled across all ever-treated cohorts", "The TWFE coefficient from a cohort-by-period interaction regression", "The average treatment effect at calendar time $t$ for cohort $g$ (first treated at $g$), using never-treated units as controls", "The pre-trend diagnostic for cohort $g$ at event time $t\\lt g$"],
+  opts: ["The treatment effect in period $t$ pooled across all cohorts treated on or before $t$", "The TWFE coefficient from a saturated cohort-by-period regression, which can have negative weights", "$E[Y_{it}(g)-Y_{it}(\\infty)|G_i=g]$: cohort $g$'s average treatment effect at time $t$", "The pre-trend diagnostic testing parallel trends for cohort $g$ at event time $t\\lt g$, used as a validity check"],
   correct: 2,
   explain: "<span class=\"verdict\">$\\text{ATT}(g,t)=E[Y_{it}(g)-Y_{it}(\\infty)|G_i=g]$ — cohort $g$'s causal effect at time $t$, using never-treated units as controls.</span>\nThe double index disaggregates the TWFE aggregate into clean building blocks. The first option pools across cohorts, losing the cohort dimension. The second option is the TWFE estimand, which can have negative weights. Pre-trend diagnostics use the same notation for $t\\lt g$ but are validity checks, not the target parameter.<span class=\"ref\">Guide §4.4</span>"
 },
 { type: "metrics", topic: "Test consistency",
   q: "A Wald test of $H_0:R\\beta=r$ is consistent against fixed alternatives. Under a fixed alternative $R\\beta=r+c$ ($c\\neq 0$), what happens to $W_n$ as $n\\to\\infty$?",
-  opts: ["$W_n\\xrightarrow{d}\\chi^2(q)$ — same as under $H_0$", "$W_n\\xrightarrow{p}0$", "$W_n$ converges to a non-central $\\chi^2$ with fixed non-centrality", "$W_n\\approx n\\cdot c'(R\\hat V R')^{-1}c\\to\\infty$, so rejection probability $\\to 1$"],
+  opts: ["$W_n\\xrightarrow{d}\\chi^2(q)$ — the standard null distribution", "$W_n\\xrightarrow{p}0$ because estimation error vanishes and $R\\hat\\beta\\to R\\beta=r+c$", "$W_n$ converges to a non-central $\\chi^2(q,\\lambda)$ with $\\lambda=n\\cdot c'(R\\hat V R')^{-1}c$ growing without bound", "$W_n\\to\\infty$ at rate $n$, ensuring rejection probability $\\to 1$ — the definition of consistency"],
   correct: 3,
   explain: "<span class=\"verdict\">Under a fixed alternative $(R\\hat\\beta-r)\\xrightarrow{p}c\\neq 0$, so $W_n$ grows like $n$ and exceeds any fixed critical value with probability approaching 1.</span>\n$W_n=n(R\\hat\\beta-r)'(R\\hat V R')^{-1}(R\\hat\\beta-r)\\approx n\\cdot c'(R\\hat V R')^{-1}c\\to\\infty$. The first option is the null distribution. The third option describes a Pitman ($O(1/\\sqrt{n})$) alternative where the non-centrality stays fixed; under a fixed alternative the non-centrality grows without bound.<span class=\"ref\">Guide §4.3</span>"
 },
@@ -355,7 +355,7 @@ const quiz = [
 },
 { type: "metrics", topic: "DiD — parallel trends",
   q: "The parallel trends assumption is best characterized as:",
-  opts: ["A testable restriction: a significant pre-trend test coefficient rejects it definitively", "The requirement that treated and control groups have identical pre-period outcome levels", "An assumption holding automatically under staggered treatment timing", "The counterfactual claim that, absent treatment, treated and control groups would have experienced the same average outcome change"],
+  opts: ["A testable restriction: a significant pre-trend coefficient definitively rejects parallel trends in all periods", "The requirement that treated and control groups have identical pre-period outcome levels and trends", "An assumption that holds automatically when treatment timing is staggered across cohorts", "The counterfactual claim that absent treatment, treated and control groups would have experienced the same average outcome change"],
   correct: 3,
   explain: "<span class=\"verdict\">Parallel trends is a counterfactual statement about unobserved potential outcomes under non-treatment — fundamentally untestable from data.</span>\nPre-trend tests provide supporting evidence but cannot test the assumption for the post-treatment period. The second option confuses parallel trends with equal levels — groups can have different levels yet still satisfy parallel trends. Staggered timing does not guarantee parallel trends; cohort self-selection based on anticipated trends violates the assumption regardless of timing structure.<span class=\"ref\">Guide §4.4</span>"
 },
@@ -385,13 +385,13 @@ const quiz = [
 },
 { type: "metrics", topic: "Logit AME — near-certain outcome",
   q: "In a logit model, the individual marginal effect of $x_j$ is $\\hat\\beta_j\\hat\\Lambda_i(1-\\hat\\Lambda_i)$. For $\\hat\\Lambda_i=0.95$, this is approximately:",
-  opts: ["$\\hat\\beta_j$ (the coefficient itself)", "$0.5\\,\\hat\\beta_j$ (AME evaluated at $\\Lambda=0.5$)", "$0.0475\\,\\hat\\beta_j$ (because $0.95\\times 0.05=0.0475$ — vanishes as $\\Lambda\\to 1$)", "$-0.95\\,\\hat\\beta_j$ (marginal effect reverses sign near certainty)"],
+  opts: ["$\\hat\\beta_j$ — the logit coefficient is a direct marginal effect when $\\Lambda\\approx 0$ or $\\Lambda\\approx 1$", "$0.5\\,\\hat\\beta_j$ — using the maximum-density point $\\Lambda=0.5$ as the evaluation value", "$0.0475\\,\\hat\\beta_j$ — since $\\Lambda(1-\\Lambda)=0.95\\times0.05=0.0475$", "$-0.95\\,\\hat\\beta_j$ — the marginal effect reverses sign near certainty as the sigmoid curves back"],
   correct: 2,
   explain: "<span class=\"verdict\">$\\Lambda(1-\\Lambda)$ is maximized at $\\Lambda=0.5$ and vanishes as $\\Lambda\\to 0$ or $1$; at $\\hat\\Lambda=0.95$ the weight is $0.95\\times 0.05=0.0475$.</span>\nNear certainty the logit sigmoid is flat, so marginal effects are near zero regardless of $\\hat\\beta_j$. The first option applies the coefficient directly, ignoring the derivative of the sigmoid — valid only near $\\Lambda=0.5$. The fourth option has the wrong sign: for positive $\\hat\\beta_j$ the marginal effect is always non-negative; it is small near certainty, not negative.<span class=\"ref\">Guide §4.6</span>"
 },
 { type: "metrics", topic: "Complier share from Wald denominator",
   q: "Under monotonicity with $E[D|Z=1]=0.6$ and $E[D|Z=0]=0.4$, what is $P(\\text{complier})$?",
-  opts: ["$P(\\text{complier})=0.6-0.4=0.2$", "$P(\\text{complier})=0.4$ ($=P(AT)$, share treated when not assigned)", "$P(\\text{complier})=0.6$ ($=P(AT)+P(C)$)", "$P(\\text{complier})$ cannot be determined without $P(\\text{always-taker})$"],
+  opts: ["$P(\\text{complier})=E[D|Z=1]-E[D|Z=0]=0.6-0.4=0.2$", "$P(\\text{complier})=0.4$ ($=P(AT)$, share treated when not assigned)", "$P(\\text{complier})=0.6$ ($=P(AT)+P(C)$)", "$P(\\text{complier})$ cannot be determined without $P(\\text{always-taker})$"],
   correct: 0,
   explain: "<span class=\"verdict\">Under monotonicity, $E[D|Z=1]-E[D|Z=0]=[P(AT)+P(C)]-P(AT)=P(C)=0.2$.</span>\n$E[D|Z=0]=P(AT)=0.4$ (only always-takers treated when not assigned). $E[D|Z=1]=P(AT)+P(C)=0.6$. The second option ($0.4$) is $P(AT)$. The third option ($0.6$) is $P(AT)+P(C)$. Monotonicity makes identification exact — no additional information is needed beyond the two conditional means.<span class=\"ref\">Guide §3.3</span>"
 },
@@ -409,7 +409,7 @@ const quiz = [
 },
 { type: "metrics", topic: "LIE step in WOLS consistency",
   q: "For WOLS with $w_i=f(X_i)$, consistency requires $E[w_iX_ie_i]=0$. The most primitive sufficient condition and the theorem linking it are:",
-  opts: ["$E[e_i]=0$; the LLN", "$\\text{Cov}(X_i,e_i)=0$; the CLT", "$E[e_i|X_i]=0$; the Law of Iterated Expectations (LIE)", "$E[w_ie_i]=0$ for each $i$; the CMT"],
+  opts: ["$E[e_i]=0$; the LLN ensures the sample average of $w_iX_ie_i$ converges to its mean", "$\\text{Cov}(X_i,e_i)=0$; the CLT provides asymptotic normality of the score", "$E[e_i|X_i]=0$; by LIE this implies $E[w_iX_ie_i]=0$ for any $w_i=f(X_i)$", "$E[w_ie_i]=0$ for each $i$; the CMT since $w_i$ is a continuous function of $X_i$"],
   correct: 2,
   explain: "<span class=\"verdict\">$E[e_i|X_i]=0$ implies $E[w_iX_ie_i]=E[w_iX_iE[e_i|X_i]]=0$ by LIE, since $w_iX_i$ is measurable given $X_i$.</span>\nMean-zero unconditional errors (first option) do not ensure $E[w_iX_ie_i]=0$ when $w_iX_i$ correlates with $e_i$ through higher moments. $\\text{Cov}(X_i,e_i)=0$ (second option) is weaker linear orthogonality and does not handle the $w_i$ factor. LIE: $E[w_iX_ie_i]=E[E[w_iX_ie_i|X_i]]=E[w_iX_i\\cdot E[e_i|X_i]]=0$.<span class=\"ref\">Guide §3.1</span>"
 },
@@ -421,7 +421,7 @@ const quiz = [
 },
 { type: "metrics", topic: "IV — over-identification",
   q: "With $K=1$ endogenous regressor and $L=3$ instruments, a student writes $\\hat\\beta=(Z'X)^{-1}Z'Y$. What error was made?",
-  opts: ["The transpose is wrong; correct form uses $(X'Z)^{-1}$", "Dividing by $n$ is missing", "With $L=3\\gt K=1$, $Z'X$ is $3\\times 1$ and $(Z'X)^{-1}$ does not exist; the correct estimator uses $P_Z=Z(Z'Z)^{-1}Z'$", "The formula is valid and extends automatically to the over-identified case"],
+  opts: ["The transpose is wrong — the correct just-identified IV formula uses $(X'Z)(Z'Z)^{-1}Z'Y$", "Dividing by $n$ is missing; the normalized form $(Z'X/n)^{-1}(Z'Y/n)$ is numerically equivalent", "$(Z'X)^{-1}$ does not exist when $L\\gt K$; use 2SLS: $\\hat\\beta=(X'P_Z X)^{-1}X'P_Z Y$", "The formula extends to $L\\gt K$ by treating $(Z'X)^{-1}$ as the Moore–Penrose pseudoinverse"],
   correct: 2,
   explain: "<span class=\"verdict\">When $L\\gt K$, $Z'X$ is $L\\times K$ (non-square) and has no inverse; writing $(Z'X)^{-1}$ is an automatic grader deduction.</span>\nThe formula $(Z'X)^{-1}Z'Y$ is valid only when $L=K$ (just-identified). With $L\\gt K$ the correct estimator is $\\hat\\beta_{2SLS}=(X'P_ZX)^{-1}X'P_ZY$ where $P_Z$ projects $X$ onto the column space of $Z$. Transposing or dividing by $n$ does not fix the dimensionality problem. The fourth option is wrong: the formula does not extend automatically.<span class=\"ref\">Guide §3.5</span>"
 },
@@ -433,13 +433,13 @@ const quiz = [
 },
 { type: "micro", topic: "Intuitive Criterion two legs",
   q: "The Intuitive Criterion (Cho-Kreps) eliminates a pooling equilibrium when off-path signal $s'$ satisfies:",
-  opts: ["Type $L$ cannot gain from $s'$ even if believed to be type $H$, but type $H$ does gain from $s'$ if believed to be type $H$.", "Both types gain from deviating to $s'$ if believed to be type $H$.", "Type $H$ gains from $s'$ regardless of off-path beliefs.", "The prior probability of type $H$ exceeds $1/2$."],
+  opts: ["Type $L$ cannot gain from $s'$ even if assigned the best belief, but type $H$ does gain.", "Both types gain from deviating to $s'$ when believed to be type $H$, so the pool is robust.", "Type $H$ gains from $s'$ regardless of off-path beliefs, making any pooling equilibrium unstable.", "The prior probability of type $H$ exceeds $1/2$, so the market assigns high-type wages off-path."],
   correct: 0,
   explain: "<span class=\"verdict\">Two legs: (i) type $L$ would not deviate to $s'$ even with the best belief (treated as $H$); (ii) given that belief, type $H$ gains from $s'$. Then $H$ deviates, unraveling the pool.</span>\nIf both types gain (second option), leg (i) fails and we cannot assign all probability to $H$. If $H$ gains regardless (third option), the two-leg logic is still needed to pin the belief. The prior (fourth option) has no role — the criterion is based on payoff dominance.<span class=\"ref\">Guide §3.6</span>"
 },
 { type: "micro", topic: "Cournot profit formula",
   q: "In symmetric Cournot duopoly ($P=a-Q$, both MC $=c$), each firm's equilibrium profit is:",
-  opts: ["$(a-c)^2/4$ (monopoly profit)", "$(a-c)^2/8$ (Stackelberg leader profit)", "$(a-c)^2/16$ (Stackelberg follower profit)", "$(a-c)^2/9$ (Cournot profit)"],
+  opts: ["$(a-c)^2/4$ (monopoly profit)", "$(a-c)^2/8$ (Stackelberg leader profit)", "$(a-c)^2/16$ (Stackelberg follower profit)", "$(a-c)^2/9$ (Cournot duopoly profit per firm)"],
   correct: 3,
   explain: "<span class=\"verdict\">Each Cournot firm: $q^*=(a-c)/3$, profit $=(a-c)^2/9$. Denominators 4, 8, 9, 16 are monopoly, Stackelberg leader, Cournot, Stackelberg follower — memorize in order.</span>\n$(a-c)^2/4$ is monopoly profit $\\pi^M$. $(a-c)^2/8$ is the Stackelberg leader's profit. $(a-c)^2/16$ is the Stackelberg follower's profit. Confusing these four is the primary oligopoly formula bank error.<span class=\"ref\">Guide §4.1</span>"
 },
@@ -451,25 +451,25 @@ const quiz = [
 },
 { type: "metrics", topic: "DiD — beta_1 identification",
   q: "In the regression $Y_{it}=\\alpha+\\beta_1\\text{Treat}_i+\\beta_2\\text{Post}_t+\\delta(\\text{Treat}_i\\times\\text{Post}_t)+\\varepsilon_{it}$, what does $\\beta_1$ identify?",
-  opts: ["The average treatment effect on the treated", "The pre-period level difference between treated and control groups — not a causal effect", "The common time trend shared by both groups", "The post-period outcome gap between treated and control"],
+  opts: ["The average treatment effect on the treated in the post-period, often confused with $\\delta$", "The pre-period level difference between groups — descriptive, not causal", "The common time trend affecting both groups in the pre-period", "The post-period outcome gap between treated and control, before adjusting for the pre-period difference"],
   correct: 1,
   explain: "<span class=\"verdict\">$\\beta_1$ is the pre-treatment baseline level gap between groups — purely descriptive, not a causal effect.</span>\n$\\beta_1$ measures the average treated-minus-control difference in the pre-period (when $\\text{Post}_t=0$). The treatment effect is $\\delta$. Misinterpreting $\\beta_1$ as a causal effect is a named deduction. $\\beta_2$ captures the common time trend (third option). Omitting either main effect causes $\\hat\\delta$ to absorb its variation and become biased.<span class=\"ref\">Guide §4.4</span>"
 },
 { type: "micro", topic: "Repeated competition",
   q: "Grim-trigger collusion thresholds: Bertrand $\\delta^*=\\frac{1}{2}$ vs Cournot $\\delta^*=\\frac{9}{17}$. Why is Bertrand collusion easier to sustain?",
-  opts: ["Bertrand deviation profits are smaller", "Bertrand punishment is harsher — Nash reversion gives zero profit instead of positive Cournot profit", "Cournot firms discount the future more", "Bertrand firms split the monopoly profit unequally"],
+  opts: ["Bertrand deviation profits are smaller because undercutting attracts inelastic demand", "Bertrand Nash reversion gives zero profit vs positive Cournot profit — harsher punishment", "Cournot firms have higher discount rates because quantities adjust slowly over multiple periods", "Bertrand firms split the monopoly profit unequally, weakening each firm's stake in maintaining the agreement"],
   correct: 1,
   explain: "<span class=\"verdict\">$\\delta^*=\\frac{\\pi^D-\\pi^M}{\\pi^D-\\pi^N}$: a lower punishment payoff $\\pi^N$ enlarges the denominator.</span>\nBertrand reversion: $\\pi^N=0$. Cournot reversion: $\\pi^N=\\frac{(a-c)^2}{9} \\gt 0$. Deviation profits are actually LARGER under Bertrand (you take the whole market), but the threat of zero profit forever dominates. Temptation over stakes.<span class=\"ref\">Guide §3.5</span>"
 },
 { type: "micro", topic: "Screening no distortion at top",
   q: "In a second-degree price discrimination menu with two types under single-crossing, 'no distortion at the top' means:",
-  opts: ["$q_L^*=q_L^{FB}$: low type at first-best; $q_H^*\\lt q_H^{FB}$: high type distorted down.", "$q_H^*=q_H^{FB}$: high type at first-best quantity; $q_L^*\\lt q_L^{FB}$: low type distorted down.", "Both types get first-best quantities; only transfers are distorted.", "$q_H^*=q_H^{FB}$ only when IR-H also binds."],
+  opts: ["$q_L^*=q_L^{FB}$ while $q_H^*\\lt q_H^{FB}$: low type undistorted, high type shaded down.", "$q_H^*=q_H^{FB}$ (high type at first-best); $q_L^*\\lt q_L^{FB}$ (low type distorted down)", "Both types receive first-best quantities; only the fixed transfers $T_L,T_H$ are adjusted to extract surplus.", "$q_H^*=q_H^{FB}$ only when IR-H is also binding, which forces the principal to leave zero rent at the top."],
   correct: 1,
   explain: "<span class=\"verdict\">IR-L and IC-H bind. FOC for $q_H$ replicates the first-best condition — no distortion at top. The low type is distorted below first-best to reduce the information rent extracted by the high type.</span>\nDistorting the high type (first option) inverts the result. First-best for both (third option) requires observable types. IR-H is strictly slack — the high type earns an information rent, so requiring IR-H to bind is wrong.<span class=\"ref\">Guide §5 screening</span>"
 },
 { type: "metrics", topic: "Staggered DiD — TWFE negative weights",
   q: "Why can TWFE be biased in staggered DiD even when parallel trends holds for every cohort?",
-  opts: ["TWFE requires strictly balanced panels; staggered entry creates gaps", "Some implicit weights on ATT$(g,t)$ terms are negative — earlier-treated cohorts serve as controls for later-treated ones, contaminating comparisons when effects are dynamic and heterogeneous", "Parallel trends is a stronger assumption under staggered timing", "TWFE does not include cohort fixed effects"],
+  opts: ["TWFE requires strictly balanced panels; staggered entry creates unbalanced gaps that violate the estimator's assumptions", "Some implicit ATT$(g,t)$ weights are negative, so the TWFE aggregate can have the wrong sign", "Parallel trends becomes untestable under staggered timing because the pre-period is shorter for late-adopting cohorts", "TWFE omits cohort fixed effects, so cohort-specific baseline levels contaminate the treatment estimate"],
   correct: 1,
   explain: "<span class=\"verdict\">The TWFE bias is a weighting problem, not a trends problem — it persists under exact parallel trends when effects are heterogeneous and dynamic.</span>\nAlready-treated units serve as implicit controls for newly-treated ones; their evolving treatment effects contaminate the comparison. This contamination arises even when parallel trends holds for every cohort. The fix is estimators like Callaway–Sant'Anna, Sun–Abraham, or Borusyak–Jaravel–Spiess that construct clean comparison groups.<span class=\"ref\">Guide §4.4</span>"
 },
@@ -499,19 +499,19 @@ const quiz = [
 },
 { type: "micro", topic: "Nash existence Debreu-Glicksberg",
   q: "Which conditions guarantee existence of a pure-strategy Nash equilibrium in a continuous game?",
-  opts: ["Finite strategy sets.", "Zero-sum structure.", "Each player has a strictly dominant strategy.", "Compact convex strategy sets; payoffs continuous and quasi-concave in own strategy."],
+  opts: ["Finite strategy sets — Nash's theorem gives existence of a mixed-strategy NE, not necessarily a pure one", "Zero-sum structure — minimax theorem guarantees a saddle point, but only for mixed strategies in general", "Each player has a strictly dominant strategy — dominance solvability ensures uniqueness, not mere existence", "Compact convex strategy sets with continuous quasi-concave payoffs"],
   correct: 3,
   explain: "<span class=\"verdict\">Debreu-Glicksberg-Fan: compact convex strategy sets plus continuous quasi-concave payoffs guarantee a pure-strategy NE via Kakutani's fixed point.</span>\nFiniteness guarantees a mixed NE (Nash's theorem) but not necessarily a pure one. Zero-sum games may require mixed strategies (e.g., Rock-Paper-Scissors). Dominant strategies ensure uniqueness but are a special case, not a general sufficient condition for existence.<span class=\"ref\">Guide §4.1</span>"
 },
 { type: "metrics", topic: "Selection bias — when zero",
   q: "In the naive comparison $E[Y|D=1]-E[Y|D=0]=\\text{ATT}+\\text{selection bias}$, selection bias equals zero if and only if:",
-  opts: ["$E[Y(1)|D=1]=E[Y(1)|D=0]$ (equal treated potential outcomes)", "$\\text{ATT}=\\text{ATE}$ (treatment effects are homogeneous)", "$E[Y|D=1]=E[Y|D=0]$ (equal observed outcomes, i.e., the naive estimate is zero)", "$E[Y(0)|D=1]=E[Y(0)|D=0]$ (equal untreated baseline potential outcomes), guaranteed under random assignment"],
+  opts: ["$E[Y(1)|D=1]=E[Y(1)|D=0]$: treated potential outcomes equal across groups", "$\\text{ATT}=\\text{ATE}$: treatment effects are constant across the population, eliminating compositional bias", "$E[Y|D=1]=E[Y|D=0]$: observed outcomes equal, so the naive comparison yields zero", "$E[Y(0)|D=1]=E[Y(0)|D=0]$: baseline untreated potential outcomes equal across groups"],
   correct: 3,
   explain: "<span class=\"verdict\">Selection bias $=E[Y(0)|D=1]-E[Y(0)|D=0]=0$ iff the two groups have the same untreated potential outcome — guaranteed by random assignment.</span>\nThis condition says the treated group would have had the same baseline as the untreated group without treatment. Random assignment (RCT) ensures $(Y(0),Y(1))\\perp D$, making selection bias exactly zero. The first option would require treated potential outcomes to be equal across groups, a different condition. Homogeneous effects (second option) implies ATT $=$ ATE but does not directly set selection bias to zero.<span class=\"ref\">Guide §3.3</span>"
 },
 { type: "micro", topic: "Pooling PBE off-path beliefs",
   q: "In a pooling PBE at $e^P$, off-path belief $\\mu(\\theta_H|e')=0$ for $e'\\ne e^P$ supports the equilibrium by:",
-  opts: ["Assigning probability 1 to type $L$ off-path, setting wage to $\\theta_L$ and deterring deviation.", "Assigning probability 1 to type $H$ off-path, raising wages for deviators.", "Requiring beliefs equal to the prior on off-path signals.", "Making off-path beliefs irrelevant because no type deviates."],
+  opts: ["Assigning probability 1 to type $L$ off-path, offering wage $\\theta_L$ and deterring deviation.", "Assigning probability 1 to type $H$ off-path, so off-path wages rise to $\\theta_H$ and the high type deviates to earn the separation premium.", "Requiring off-path beliefs equal to the prior, so the off-path wage is a weighted average $\\mu\\theta_H+(1-\\mu)\\theta_L$ that may exceed the pooling wage.", "Making off-path beliefs irrelevant because in a pooling PBE no agent ever deviates on the equilibrium path."],
   correct: 0,
   explain: "<span class=\"verdict\">$\\mu(\\theta_H|e')=0$ assigns certainty to type $L$ off-path, offering wage $\\theta_L$ — the pessimistic belief deters both types from deviating.</span>\nProbability 1 on $H$ off-path raises the off-path wage to $\\theta_H$, inviting type $H$ to deviate and destroying the pool (second option). Bayes' rule applies only on-path; off-path beliefs are unrestricted in PBE. Claiming beliefs are irrelevant contradicts PBE's requirement to specify them at every information set.<span class=\"ref\">Guide §3.6, §6 item 9</span>"
 },
@@ -529,7 +529,7 @@ const quiz = [
 },
 { type: "micro", topic: "Signaling single-crossing",
   q: "In the Spence model, $\\partial^2 c/\\partial e\\,\\partial\\theta\\lt0$ (single-crossing) implies:",
-  opts: ["High types have higher total signaling costs.", "Pooling equilibria are stable because low types cannot profitably deviate.", "High types have lower marginal signaling costs, enabling credible separation via education.", "Indifference curves for different types never intersect in $(e,w)$ space."],
+  opts: ["High types bear higher total signaling costs since they acquire more education in equilibrium.", "Pooling equilibria are stable: low types cannot mimic high types at any education level when single-crossing holds.", "High types have lower marginal costs of education, making separation credible.", "Indifference curves for different types never cross in $(e,w)$ space, so payoff rankings are globally consistent."],
   correct: 2,
   explain: "<span class=\"verdict\">$\\partial^2 c/\\partial e\\,\\partial\\theta\\lt0$: marginal cost of education decreases in type. High types signal more cheaply at the margin — their IC curve is steeper in $(e,w)$ space, making high education a credible signal.</span>\nTotal cost may vary; the relevant comparison is marginal. Single-crossing means curves cross exactly once — not never. Pooling tends to fail under single-crossing via the Intuitive Criterion, not be stabilized.<span class=\"ref\">Guide §3.6</span>"
 },
@@ -541,7 +541,7 @@ const quiz = [
 },
 { type: "metrics", topic: "Panel FD — omitted linear trend",
   q: "A researcher applies first differences to $Y_{it}=\\alpha+x_{it}'\\beta+c_i+\\gamma t+u_{it}$. After differencing, what must be done?",
-  opts: ["Nothing — differencing removes all time effects including linear trends", "Include a constant in the FD regression because $\\gamma t$ first-differences to $\\gamma$, a non-zero constant", "Add unit fixed effects to absorb $c_i$ after differencing", "Log-transform $Y_{it}$ before differencing to eliminate the trend"],
+  opts: ["Nothing — first-differencing removes all time effects including any linear trend", "Add a constant to the FD regression because $\\Delta(\\gamma t)=\\gamma$", "Add unit fixed effects to absorb the $c_i$ that first-differencing already removed", "Log-transform $Y_{it}$ before differencing so the linear trend becomes an additive constant that cancels"],
   correct: 1,
   explain: "<span class=\"verdict\">A linear time trend first-differences to $\\gamma(t-(t-1))=\\gamma$, a constant that must be included as an intercept in the FD regression.</span>\nFD removes $c_i$ ($\\Delta c_i=0$) but not $\\gamma t$: $\\Delta(\\gamma t)=\\gamma$. Omitting this intercept pushes $\\gamma$ into the residual, biasing all slope estimates. Adding unit fixed effects (third option) re-introduces what FD already removed. This was tested in August 2025.<span class=\"ref\">Guide §4.5</span>"
 },
@@ -559,7 +559,7 @@ const quiz = [
 },
 { type: "micro", topic: "Risk aversion Jensen",
   q: "Agent has $u(0)=0$, $u(50)=7$, $u(100)=10$. Is the agent risk-averse over the 50-50 lottery on $\\{0,100\\}$?",
-  opts: ["No — $u(50)\\lt u(100)$, so the agent prefers more wealth.", "No — risk aversion requires $u(50)=5$ exactly.", "Yes — $u(50)=7\\gt\\tfrac{1}{2}u(0)+\\tfrac{1}{2}u(100)=5$, satisfying Jensen's inequality.", "Cannot be determined without knowing $u$ between 0 and 50."],
+  opts: ["No — $u(50)\\lt u(100)$ shows only monotonicity; risk aversion requires an additional concavity test", "No — risk aversion requires $u(50)=5$; $u(50)=7\\gt5$ implies risk-seeking behavior instead", "Yes — $u(50)=7\\gt5=\\tfrac{1}{2}u(0)+\\tfrac{1}{2}u(100)$, Jensen holds", "Cannot be determined from three points — full concavity requires $u''\\lt 0$ everywhere, not just at 50"],
   correct: 2,
   explain: "<span class=\"verdict\">Midpoint test: $u(E[X])=u(50)=7\\gt5=\\frac12 u(0)+\\frac12 u(100)=E[u(X)]$. By Jensen (concave $u$), the agent is risk-averse.</span>\nComparing $u(50)$ to $u(100)$ tests monotonicity, not concavity. Risk-averse agents have $CE\\lt E[X]$, not $CE=E[X]$ — that is risk neutrality (second option). Three data points are sufficient for the midpoint test; no further information is needed.<span class=\"ref\">Guide §3.4</span>"
 },
@@ -571,7 +571,7 @@ const quiz = [
 },
 { type: "metrics", topic: "Delta method — ratio g",
   q: "You estimate $(\\hat\\beta_1,\\hat\\beta_2)'$ with $\\sqrt{n}(\\hat\\beta-\\beta) \\xrightarrow{d} N(0,V)$, $V=\\begin{pmatrix}V_{11}&V_{12}\\\\V_{12}&V_{22}\\end{pmatrix}$. The asymptotic variance of $\\sqrt{n}(\\hat\\beta_1/\\hat\\beta_2 - \\beta_1/\\beta_2)$ is:",
-  opts: ["$V_{11}/\\beta_2^2 - 2\\beta_1 V_{12}/\\beta_2^3 + \\beta_1^2 V_{22}/\\beta_2^4$", "$V_{11}/\\beta_2^2$ (ignoring covariance terms)", "$(V_{11}+V_{22})/\\beta_2^2$", "$(V_{11}-2V_{12}+V_{22})/\\beta_2^2$"],
+  opts: ["$V_{11}/\\beta_2^2 - 2\\beta_1 V_{12}/\\beta_2^3 + \\beta_1^2 V_{22}/\\beta_2^4$", "$V_{11}/\\beta_2^2$, omitting the cross and second-component terms since $V_{12}$ is often small", "$(V_{11}+V_{22})/\\beta_2^2$, treating both components as contributing equally to ratio variance", "$(V_{11}-2V_{12}+V_{22})/\\beta_2^2$, which arises from the delta method applied to the difference $\\beta_1-\\beta_2$"],
   correct: 0,
   explain: "<span class=\"verdict\">Gradient $\\nabla g=(1/\\beta_2,\\ -\\beta_1/\\beta_2^2)'$; avar $=\\nabla g'V\\nabla g = V_{11}/\\beta_2^2 - 2\\beta_1 V_{12}/\\beta_2^3 + \\beta_1^2 V_{22}/\\beta_2^4$.</span>\nThe second option ignores $V_{12}$ and $V_{22}$ — a common error when students forget the ratio gradient has two non-zero components. The third option uses gradient $(1/\\beta_2,1/\\beta_2)'$ which is wrong for a ratio. The fourth option is the variance-of-a-difference formula ($g=\\beta_1-\\beta_2$), not the ratio.<span class=\"ref\">Guide §3.2</span>"
 },
@@ -583,7 +583,7 @@ const quiz = [
 },
 { type: "micro", topic: "Moral hazard observable effort",
   q: "In a P-A model with agent utility $\\sqrt{w}-c(e)$ and risk-neutral principal, observable effort yields:",
-  opts: ["Full insurance for the agent: fixed wage $w^*=[c(e^{FB})+\\bar{u}]^2$ at first-best effort.", "Full risk on the agent (residual claimancy) to maximize incentives.", "The same allocation as unobservable effort.", "A 50-50 output share."],
+  opts: ["Full insurance: fixed wage $w^*=[c(e^{FB})+\\bar{u}]^2$ at first-best effort.", "Full risk on the agent (residual claimancy) — the principal sells the project at a fixed fee to give the agent maximum incentives.", "The same allocation as unobservable effort, since the IR constraint binds in both cases and efficient effort is always implemented.", "A 50-50 output share splits risk efficiently when both parties are equally risk-averse."],
   correct: 0,
   explain: "<span class=\"verdict\">Observable effort removes the IC constraint. With only IR binding and a risk-averse agent, optimal risk sharing gives full insurance: fixed wage $w^*=[c(e^{FB})+\\bar{u}]^2$.</span>\nFull output risk (second option) is the incentive contract under unobservable effort. Observable effort strictly dominates — not the same allocation. A 50-50 share has no optimality basis when effort is observable.<span class=\"ref\">Guide §5 moral hazard</span>"
 },
@@ -595,25 +595,25 @@ const quiz = [
 },
 { type: "micro", topic: "Folk theorem minmax",
   q: "In the Folk theorem, the minmax payoff $\\underline{v}_i$ for player $i$ is:",
-  opts: ["Player $i$'s NE payoff in the stage game.", "The maximum payoff $i$ can guarantee: $\\max_{s_i}\\min_{s_{-i}}u_i$ (maximin).", "The average of all stage NE payoffs.", "The minimum opponents can hold $i$ to when $i$ best-responds: $\\min_{s_{-i}}\\max_{s_i}u_i$."],
+  opts: ["Player $i$'s NE payoff — the punishment value if the game resets to the worst Nash equilibrium.", "The maximin: $\\max_{s_i}\\min_{s_{-i}}u_i$, what $i$ can guarantee by playing optimally against the worst case.", "The average of all stage NE payoffs, used as the baseline when multiple equilibria provide graded punishments.", "$\\min_{s_{-i}}\\max_{s_i}u_i$: opponents minimize $i$'s best response"],
   correct: 3,
   explain: "<span class=\"verdict\">Minmax: $\\underline{v}_i=\\min_{s_{-i}}\\max_{s_i}u_i$ — opponents minimize, $i$ best-responds. Folk theorem: any feasible payoff strictly above each minmax is sustainable in SPNE for $\\delta$ near 1.</span>\nConfusing minmax with Nash payoff is a major deduction. The maximin (second option) is what $i$ can guarantee — generally $\\le$ the minmax. Averaging NE payoffs is not a standard concept and unrelated to the Folk theorem bound.<span class=\"ref\">Guide §3.5, §6 item 12</span>"
 },
 { type: "metrics", topic: "Unbiased vs consistent",
   q: "Let $\\hat\\mu=Y_1$ (first observation only) as an estimator of $\\mu=E[Y_i]$ in an i.i.d. sample of size $n$. Which is correct?",
-  opts: ["$\\hat\\mu$ is unbiased but not consistent: $\\text{Var}(Y_1)=\\sigma^2$ for all $n$, so $\\hat\\mu \\not\\xrightarrow{p} \\mu$", "$\\hat\\mu$ is unbiased and consistent", "$\\hat\\mu$ is consistent but not unbiased", "$\\hat\\mu$ is neither unbiased nor consistent"],
+  opts: ["$\\hat\\mu$ is unbiased but not consistent", "$\\hat\\mu$ is unbiased and consistent: $E[Y_1]=\\mu$ and $\\text{Var}(Y_1)/n\\to 0$", "$\\hat\\mu$ is consistent but biased because $E[Y_1]\\ne\\mu$ for small $n$", "$\\hat\\mu$ is neither unbiased nor consistent — sampling only one unit introduces systematic error"],
   correct: 0,
   explain: "<span class=\"verdict\">$E[Y_1]=\\mu$ (unbiased), but $\\text{Var}(Y_1)=\\sigma^2$ for all $n$ — the estimator never concentrates around $\\mu$ (not consistent).</span>\nConsistency requires $P(|\\hat\\mu-\\mu|\\gt\\varepsilon)\\to 0$, which needs variance shrinking to zero. Since $\\text{Var}(Y_1)=\\sigma^2$ regardless of $n$, no convergence occurs. The fourth option incorrectly denies unbiasedness: $Y_1$ is drawn from the same distribution so $E[Y_1]=\\mu$. This is the canonical exam example of unbiased-but-inconsistent.<span class=\"ref\">Guide §5 (unbiased vs consistent)</span>"
 },
 { type: "metrics", topic: "WOLS asymptotic variance",
   q: "In WOLS with weights $w_i = f(X_i) \\gt 0$, sandwich avar $A^{-1}BA^{-1}$ with $A=E[w_i X_i X_i']$, $B=E[w_i^2 X_i X_i' e_i^2]$. Under what joint condition does the sandwich collapse to $\\sigma^2 A^{-1}$?",
-  opts: ["$E[e_i^2|X_i]=\\sigma^2$ and $w_i=1$ for all $i$ (homoskedastic unweighted OLS)", "$E[e_i|X_i]=0$ (conditional mean-zero errors only)", "$f(X_i)$ is strictly increasing in $X_i$", "The sample size $n$ exceeds the number of regressors $K$"],
+  opts: ["$E[e_i^2|X_i]=\\sigma^2$ and $w_i=1$", "$E[e_i|X_i]=0$: conditional mean-zero errors imply $B=\\sigma_e^2 E[w_i^2 X_iX_i']$, which collapses the sandwich", "$f(X_i)$ is strictly increasing in $X_i$, ensuring the weight matrix is positive definite and numerically stable", "$n$ exceeds $K$: the law of large numbers then guarantees the sandwich converges to the classical form"],
   correct: 0,
   explain: "<span class=\"verdict\">The sandwich collapses only when weights are constant ($w_i=1$) <i>and</i> errors are homoskedastic.</span>\nUnder those conditions $B=E[e_i^2 X_iX_i']=\\sigma^2 E[X_iX_i']=\\sigma^2 A$, so $A^{-1}BA^{-1}=\\sigma^2 A^{-1}$. Mean-zero errors alone (second option) say nothing about $E[e_i^2|X_i]$. With non-constant $w_i$, even homoskedasticity is insufficient: $B=\\sigma^2 E[w_i^2 X_iX_i'] \\neq \\sigma^2 E[w_i X_iX_i']=\\sigma^2 A$.<span class=\"ref\">Guide §3.1</span>"
 },
 { type: "metrics", topic: "Over-identified IV",
   q: "With $L$ instruments and $K$ regressors, $L \\gt K$, the correct estimator is:",
-  opts: ["$(Z'X)^{-1}Z'Y$", "$(X'X)^{-1}X'P_ZY$", "$(Z'Z)^{-1}Z'Y$", "$(X'P_ZX)^{-1}X'P_ZY$ with $P_Z=Z(Z'Z)^{-1}Z'$"],
+  opts: ["$(Z'X)^{-1}Z'Y$ — the just-identified IV formula, valid when $L=K$", "$(X'X)^{-1}X'P_ZY$ — OLS on $Z$-projected outcome, inconsistent when $X$ is endogenous", "$(Z'Z)^{-1}Z'Y$ — the reduced-form projection of $Y$ on $Z$, not the IV estimator", "$(X'P_ZX)^{-1}X'P_ZY$ — 2SLS formula projecting $X$ on instrument space $Z$"],
   correct: 3,
   explain: "<span class=\"verdict\">2SLS — project $X$ onto the instrument space first.</span>\n$(Z'X)$ is $L\\times K$, not square, so $(Z'X)^{-1}$ doesn't exist — writing it is an automatic deduction. 2SLS = OLS of $Y$ on $\\hat{X}=P_ZX$, using $P_Z'=P_Z$ and $P_Z^2=P_Z$. Option (c) is the reduced form on instruments, not IV.<span class=\"ref\">Guide §3.5</span>"
 },
@@ -637,19 +637,19 @@ const quiz = [
 },
 { type: "micro", topic: "EU linearity in p",
   q: "An agent prefers $p$ to $q$ iff $E_p[z^2]\\ge E_q[z^2]$ (prizes $z$). Which statement is correct?",
-  opts: ["No EU representation: $z^2$ is convex so cannot be a Bernoulli utility.", "EU representation exists: $u(z)=z^2$ gives $E_p[u]=\\sum_z z^2 p(z)$, linear in $p$.", "No EU representation: $E[z^2]=\\text{Var}(z)+(E[z])^2$ is quadratic in $p$.", "EU representation exists only if prizes are non-negative."],
+  opts: ["No EU representation: convexity of $z^2$ in $z$ violates the concavity condition required for any Bernoulli utility", "EU exists: $u(z)=z^2$ is a valid Bernoulli utility; $E_p[u]$ is linear in $p$", "No EU representation: $E[z^2]=\\text{Var}(z)+(E[z])^2$, where $(E[z])^2$ is quadratic in $p$, violating linearity", "EU exists only when prizes are non-negative, so $z^2$ maps to $[0,\\infty)$ and the expected value is well-defined"],
   correct: 1,
   explain: "<span class=\"verdict\">$V(p)=E_p[z^2]=\\sum_z z^2 p(z)$ is linear in the probability vector $p$. Setting $u(z)=z^2$ gives a valid EU representation.</span>\nThe third option confuses $E[z^2]$ (second raw moment, linear in $p$) with $\\text{Var}(z)=E[z^2]-(E[z])^2$, where $(E[z])^2$ is quadratic in $p$ — but $E[z^2]$ itself is linear. Convexity of $z^2$ in $z$ does not prevent it from being a Bernoulli utility. Non-negativity of prizes has no bearing on the EU question.<span class=\"ref\">Guide §3.4</span>"
 },
 { type: "micro", topic: "Duality identity LNS",
   q: "The identity $e(p,v(p,w))=w$ holds under which condition?",
-  opts: ["Strict quasi-concavity of utility.", "Continuity of utility.", "Differentiability of the expenditure function.", "Local non-satiation (LNS), so budget and utility constraints both bind."],
+  opts: ["Strict quasi-concavity — it ensures a unique interior solution so the duality maps coincide exactly.", "Continuity of utility — required by Debreu's theorem to represent preferences with a continuous function.", "Differentiability of $e$ — needed for Shephard's lemma, which in turn implies the identity by integration.", "Local non-satiation (LNS) — ensures both budget and utility constraints bind at the optimum"],
   correct: 3,
   explain: "<span class=\"verdict\">LNS forces the budget to bind in the UMP and the utility constraint to bind in the EMP. Without LNS a satiated consumer need not spend all income, so $e(p,v(p,w))\\lt w$ is possible.</span>\nStrict quasi-concavity pins interior solutions but does not prevent satiation. Continuity is needed for Debreu's representation theorem, not for duality. Differentiability of $e$ supports Shephard's lemma, not the basic identity.<span class=\"ref\">Guide §3.2</span>"
 },
 { type: "micro", topic: "Finite repetition no cooperation",
   q: "A game is played $T=5$ times; the stage game has a unique NE with payoffs $(1,1)$. Under SPNE, which outcome occurs in every period?",
-  opts: ["Cooperation $(C,C)$ in periods 1-4, stage NE in period 5.", "Cooperation for $\\delta\\ge9/17$.", "Cooperation in all periods if $T$ is large enough.", "Stage NE $(D,D)$ every period — backward induction fully unravels."],
+  opts: ["$(C,C)$ in periods 1-4, stage NE in period 5 — the last-period NE is unavoidable but cooperation holds before", "$(C,C)$ whenever $\\delta\\ge9/17$ — the Cournot collusion threshold applies to finitely repeated games too", "$(C,C)$ in all periods when $T$ is large, since the shadow of the future outweighs one-shot gain", "Stage NE every period — backward induction unravels"],
   correct: 3,
   explain: "<span class=\"verdict\">Unique stage NE: backward induction gives $(D,D)$ in period 5; no threat in period 4, so $(D,D)$ there too; unravels to period 1. SPNE is $(D,D)$ every period.</span>\nCooperation in all-but-the-last ignores that period 4 also unravels once period 5 is fixed. Discount-factor arguments apply to infinite-horizon games. Making $T$ large does not help with a unique stage NE — the exception requires <i>multiple</i> stage NE for a carrot-stick construction.<span class=\"ref\">Guide §3.5</span>"
 },
@@ -661,7 +661,7 @@ const quiz = [
 },
 { type: "metrics", topic: "ITT vs LATE",
   q: "In a randomized trial with imperfect compliance (binary $Z$, binary $D$), the ITT estimator is $E[Y|Z=1]-E[Y|Z=0]$. How does ITT relate to LATE?",
-  opts: ["ITT $=$ LATE always, because randomization ensures $Z\\perp e$", "ITT $=$ LATE $/$ P(complier), so ITT exceeds LATE", "ITT equals the ATT, not LATE", "ITT $=$ P(complier) $\\times$ LATE, so ITT $\\le$ LATE in magnitude under positive effects"],
+  opts: ["ITT $=$ LATE: randomization ensures $Z\\perp e$ so the intent-to-treat and local average effects coincide", "ITT $=$ LATE $\\div$ P(complier): dividing by the compliance rate scales up to recover the treatment effect", "ITT equals the ATT when always-takers are absent and all treated comply", "ITT $=$ P(complier) $\\times$ LATE: the Wald numerator diluted by non-compliers"],
   correct: 3,
   explain: "<span class=\"verdict\">The Wald numerator (ITT) $=$ P(complier) $\\times$ LATE; dividing by P(complier) recovers LATE.</span>\nITT includes all randomized units, diluting the effect by non-compliers (always-takers and never-takers who have zero treatment variation). The Wald formula divides ITT by the first stage to recover LATE. The second option inverts the relationship. Under positive effects and partial compliance, ITT is strictly smaller in magnitude than LATE because it averages over non-responders.<span class=\"ref\">Guide §3.3</span>"
 }

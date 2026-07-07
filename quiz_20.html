@@ -73,8 +73,8 @@ const quiz = [
   opts: [
     "$\\sum_i f(X_i)\\,X_i\\,\\hat{e}_i = 0$",
     "$\\sum_i \\hat{e}_i = 0$",
-    "$\\sum_i X_i\\hat{e}_i = 0$",
-    "$\\hat{e}_i = 0$ for every $i$"
+    "$\\sum_i X_i\\hat{e}_i = 0$ — unweighted orthogonality condition, ignoring the WOLS weights",
+    "$\\hat{e}_i = 0$ for every $i$ — exact fit at every observation, as in an interpolating regression"
   ],
   correct: 0,
   explain: `<span class="verdict">The FOC is exactly the weighted orthogonality condition.</span>
@@ -97,7 +97,7 @@ By LIE, $B=E[X_iX_i'E(e_i^2|X_i)]=\\sigma^2E[X_iX_i']=\\sigma^2A$, so $A^{-1}BA^
   type: "metrics", topic: "Delta method",
   q: "$\\sqrt{n}(\\hat{\\beta}-\\beta)\\xrightarrow{d}N(0,V)$ and $\\gamma=\\beta^2$. The asymptotic variance of $\\hat{\\beta}^2$ is:",
   opts: [
-    "$V^2$",
+    "$V^2$ — variance squared, arising if you apply the delta method to the variance rather than the estimator",
     "$2\\beta V$",
     "$4\\beta^2 V$",
     "$\\beta^4 V$"
@@ -110,9 +110,9 @@ $\\sqrt{n}(\\hat{\\beta}^2-\\beta^2)\\xrightarrow{d}N(0,\\,4\\beta^2V)$. Remembe
   type: "metrics", topic: "LATE assumptions",
   q: "In the LATE framework with binary instrument $Z$ and treatment $D$, which assumption rules out defiers?",
   opts: [
-    "Independence: $Z\\perp(Y(0),Y(1),D(0),D(1))$",
+    "Independence: $Z\\perp(Y(0),Y(1),D(0),D(1))$ — instrument is as-good-as-randomly assigned",
     "Exclusion: $Z$ affects $Y$ only through $D$",
-    "Relevance: $E[D|Z=1]\\neq E[D|Z=0]$",
+    "Relevance: $E[D|Z=1]\\neq E[D|Z=0]$ — the first-stage condition ensuring the instrument predicts treatment",
     "Monotonicity: $D_i(1)\\ge D_i(0)$ for all $i$"
   ],
   correct: 3,
@@ -123,9 +123,9 @@ Defiers have $(D(0),D(1))=(1,0)$, exactly what $D_i(1)\\ge D_i(0)$ forbids. With
   type: "metrics", topic: "Over-identified IV",
   q: "With $L$ instruments and $K$ regressors, $L \\gt K$, the correct estimator is:",
   opts: [
-    "$(Z'X)^{-1}Z'Y$",
+    "$(Z'X)^{-1}Z'Y$ — the just-identified formula, but $(Z'X)$ is $L\\times K$ and non-square here",
     "$(X'X)^{-1}X'P_ZY$",
-    "$(Z'Z)^{-1}Z'Y$",
+    "$(Z'Z)^{-1}Z'Y$ — reduced form regressing outcome directly on instruments",
     "$(X'P_ZX)^{-1}X'P_ZY$ with $P_Z=Z(Z'Z)^{-1}Z'$"
   ],
   correct: 3,
@@ -138,8 +138,8 @@ $(Z'X)$ is $L\\times K$, not square, so $(Z'X)^{-1}$ doesn't exist — writing i
   opts: [
     "$5$ — classical error is harmless",
     "$4$ — attenuated by the reliability ratio $0.8$",
-    "$6.25$ — inflated by the noise",
-    "$0$ — OLS is uninformative"
+    "$6.25$ — amplified upward because the noise variance inflates the denominator",
+    "$0$ — OLS is completely uninformative when measurement error is present"
   ],
   correct: 1,
   explain: `<span class="verdict">$\\mathrm{plim}\\,\\hat{\\beta}_1 = \\beta_1\\frac{\\sigma_x^2}{\\sigma_x^2+\\sigma_\\varepsilon^2} = 5\\times\\frac{4}{5} = 4$.</span>
@@ -150,7 +150,7 @@ Attenuation bias: always toward zero, sign preserved, worse as the noise share g
   q: "For the within (FE) estimator with $N$ units, $T$ periods, $K$ regressors, the correct degrees of freedom for $\\hat{\\sigma}_u^2$ is:",
   opts: [
     "$NT-K$",
-    "$NT-N-T-K$",
+    "$NT-N-T-K$ — subtracts both unit and time fixed effects from total observations",
     "$N(T-1)-K$",
     "$N-K$"
   ],
@@ -164,8 +164,8 @@ The within transformation imposes $N$ constraints (each unit's residuals average
   opts: [
     "$\\chi^2(1)$",
     "$N(0,1)$",
-    "$\\chi^2(3)$",
-    "$F(3, n-4)$ exactly, in any sample size"
+    "$\\chi^2(3)$ — one degree of freedom per restriction",
+    "$F(3, n-4)$ — exact finite-sample $F$ under homoskedastic normal errors"
   ],
   correct: 2,
   explain: `<span class="verdict">$\\chi^2(q)$ with $q=3$ restrictions — count the rows of $R$.</span>
@@ -188,10 +188,10 @@ By the union bound, FWER $\\le\\sum_j\\alpha/m=\\alpha$ — no independence requ
   type: "metrics", topic: "Staggered DiD",
   q: "With staggered adoption and heterogeneous dynamic treatment effects, plain two-way FE can be badly biased even under exact parallel trends. Why?",
   opts: [
-    "Because parallel trends is untestable",
+    "Because parallel trends is untestable in pre-treatment periods, making the entire DiD design non-falsifiable.",
     "Because the TWFE estimand puts negative weights on some ATT$(g,t)$ — already-treated units serve as controls",
-    "Because clustering fails with staggered timing",
-    "Because ATT$(g,t)$ is not identified under parallel trends"
+    "Because standard clustering of standard errors fails under staggered timing, inflating the test statistic.",
+    "Because ATT$(g,t)$ is not identified under parallel trends when treatment timing is heterogeneous across groups."
   ],
   correct: 1,
   explain: `<span class="verdict">It's a weighting problem, not a trends problem.</span>
@@ -203,10 +203,10 @@ TWFE compares newly-treated to already-treated units whose effects are still evo
   type: "micro", topic: "Linear utility demand",
   q: "$u=\\alpha_1x_1+\\alpha_2x_2+\\alpha_3x_3$ with $\\alpha=(2,3,1)$ and $p=(1,2,1)$. Where does wealth $w$ go?",
   opts: [
-    "Split across goods in proportion to the $\\alpha_i$",
+    "Split across all three goods",
     "The interior tangency point from the Lagrangian",
     "All on good 2 — highest $\\alpha_i = 3$",
-    "All on good 1 — highest $\\alpha_i/p_i = 2$"
+    "All on good 1 — highest utility per dollar: $\\alpha_i/p_i = 2$"
   ],
   correct: 3,
   explain: `<span class="verdict">Best utility per dollar: $\\alpha_1/p_1=2$ beats $3/2=1.5$ and $1$.</span>
@@ -231,8 +231,8 @@ Compare corners: $(10,0)$ gives $u=100$; $(0,5)$ gives $u=25$. Rule: $i^*=\\arg\
   opts: [
     "$e(p,u) = u\\cdot\\bigl(\\dfrac{p_1}{a_1}+\\dfrac{p_2}{a_2}\\bigr)$",
     "$e(p,u) = u\\cdot\\min_i \\dfrac{p_i}{a_i}$",
-    "$e(p,u) = u\\cdot\\dfrac{p_1^{1/2}p_2^{1/2}}{(a_1a_2)^{1/2}}$",
-    "$e(p,u) = u\\cdot\\max_i \\dfrac{p_i}{a_i}$"
+    "$e(p,u) = u\\cdot\\dfrac{p_1^{1/2}p_2^{1/2}}{(a_1a_2)^{1/2}}$ — geometric-mean form for Cobb-Douglas",
+    "$e(p,u) = u\\cdot\\max_i \\dfrac{p_i}{a_i}$ — picks the most expensive good per unit of utility"
   ],
   correct: 0,
   explain: `<span class="verdict">Perfect complements: you must buy the whole bundle — costs ADD.</span>
@@ -245,7 +245,7 @@ At the kink $a_1x_1=a_2x_2=u$, so $h_i=u/a_i$ and $e=p_1\\frac{u}{a_1}+p_2\\frac
     "Strict convexity",
     "Continuity",
     "Local non-satiation",
-    "Homotheticity"
+    "Homotheticity — implies expenditure scales proportionally with the utility target across all price vectors"
   ],
   correct: 2,
   explain: `<span class="verdict">Local non-satiation — it makes the constraints bind.</span>
@@ -255,10 +255,10 @@ LNS forces the consumer to spend all wealth (budget binds) and the EMP to hit th
   type: "micro", topic: "Utility representation",
   q: "If $u$ represents $\\succsim$ (i.e., $x\\succsim y \\iff u(x)\\ge u(y)$), which properties MUST $\\succsim$ have?",
   opts: [
-    "Completeness, transitivity, and continuity",
+    "Completeness, transitivity, and continuity — all three required by Debreu's representation theorem",
     "Completeness and transitivity — but not necessarily continuity",
     "Transitivity and continuity — but not necessarily completeness",
-    "Only completeness"
+    "Only completeness — transitivity is implied by the real-number ordering of $u$'s codomain"
   ],
   correct: 1,
   explain: `<span class="verdict">Representation ⇒ complete + transitive; continuity is NOT implied.</span>
@@ -269,7 +269,7 @@ $\\ge$ on $\\mathbb{R}$ is complete and transitive, and those properties pull ba
   q: "Lexicographic preferences on $\\mathbb{R}^2$ are the canonical counterexample showing:",
   opts: [
     "Complete + transitive preferences can fail continuity (and lack a utility representation)",
-    "Transitive preferences can fail completeness",
+    "Transitive preferences can fail completeness, as in Pareto partial orders over multi-attribute outcomes",
     "Complete preferences can fail transitivity",
     "Continuous preferences can fail transitivity"
   ],
@@ -283,7 +283,7 @@ The sequence $x^n=(1-\\frac{1}{n},1)\\to(1,1)$ with $y=(1,0)$: every $x^n\\prec 
   opts: [
     "No utility representation exists — the relation is incomplete",
     "A utility representation exists AND it is an EU representation",
-    "It is an EU representation with Bernoulli utility $u(z)=z-z^2$",
+    "It is an EU representation with Bernoulli utility $u(z)=z-z^2$, because the variance term can be absorbed into the Bernoulli index",
     "A utility representation exists, but it is NOT EU — variance is quadratic in $p$, violating independence"
   ],
   correct: 3,
@@ -294,10 +294,10 @@ $\\mathrm{Var}(\\alpha p+(1-\\alpha)r)\\neq\\alpha\\mathrm{Var}(p)+(1-\\alpha)\\
   type: "micro", topic: "Repeated competition",
   q: "Grim-trigger collusion thresholds: Bertrand $\\delta^*=\\frac{1}{2}$ vs Cournot $\\delta^*=\\frac{9}{17}$. Why is Bertrand collusion easier to sustain?",
   opts: [
-    "Bertrand deviation profits are smaller",
+    "Bertrand deviation profits are smaller, so the temptation gain is lower and $\\delta^*$ falls",
     "Bertrand punishment is harsher — Nash reversion gives zero profit instead of positive Cournot profit",
-    "Cournot firms discount the future more",
-    "Bertrand firms split the monopoly profit unequally"
+    "Cournot firms discount the future more heavily, raising the effective $\\delta^*$ threshold in that market",
+    "Bertrand firms split the monopoly profit unequally, leaving the low-cost firm with a larger collusive share"
   ],
   correct: 1,
   explain: `<span class="verdict">$\\delta^*=\\frac{\\pi^D-\\pi^M}{\\pi^D-\\pi^N}$: a lower punishment payoff $\\pi^N$ enlarges the denominator.</span>
@@ -321,9 +321,9 @@ The low type must (weakly) prefer honesty: $\\theta_L \\ge \\theta_H - e_H/\\the
   q: "A stage game has a UNIQUE Nash equilibrium. The game is repeated $T=100$ times. In the unique SPNE:",
   opts: [
     "Cooperation can be sustained in early periods if players are patient",
-    "Any feasible individually-rational payoff can be sustained (Folk theorem)",
+    "Any feasible individually-rational payoff can be sustained",
     "Cooperation is sustained in all but the last period",
-    "The stage NE is played in every period — cooperation is impossible"
+    "The stage NE is played in every period — backward induction unravels cooperation completely"
   ],
   correct: 3,
   explain: `<span class="verdict">Backward induction unravels everything.</span>
